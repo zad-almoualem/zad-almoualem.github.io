@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html,body{height:100%;margin:0} img{max-width:100%} [hidden]{display:none!important} :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>زاد المعلّم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;700&display=swap">
+<style>
+/* Layout: one centered column (max 1080px). Grades are drawn as Tunisian notebook covers (كرّاس) with Seyes-ruled labels; everything else is quiet list rows. */
+:root{
+  --paper:#f4f6fb; --surface:#ffffff; --sunk:#eef1f8;
+  --ink:#18213b; --muted:#5a6482; --line:#dce1ee;
+  --accent:#2443b0; --accent-ink:#ffffff; --accent-soft:#e6ebfb;
+  --red:#c4302b; --red-soft:#fbe8e7;
+  --ok:#1b7647; --ok-soft:#e2f3e9; --warn:#935d00; --warn-soft:#fbefd9;
+  --rule:#cfdaf3; --margin:#e9a5a2;
+  --g1:#c93c3c; --g2:#c06a0c; --g3:#23874c; --g4:#2471b3; --g5:#6447b8; --g6:#1d2c66;
+  --cover-ink:#ffffff;
+  --shadow:0 1px 2px rgb(24 33 59 / .06), 0 6px 18px rgb(24 33 59 / .07);
+  --f-display:"Reem Kufi","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --f-body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0f1320; --surface:#171c2b; --sunk:#1d2335;
+  --ink:#e7eaf4; --muted:#9aa3bf; --line:#2a3148;
+  --accent:#8ea6ff; --accent-ink:#0f1320; --accent-soft:#222c4d;
+  --red:#ff8a84; --red-soft:#3a1f22; --ok:#6fd39c; --ok-soft:#173226; --warn:#f0b75a; --warn-soft:#352a14;
+  --rule:#2c3552; --margin:#6b3a3c;
+  --g1:#a83434; --g2:#9e5810; --g3:#1d7040; --g4:#1f5f97; --g5:#55399e; --g6:#2a3b80;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 6px 18px rgb(0 0 0 / .25);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0f1320; --surface:#171c2b; --sunk:#1d2335;
+  --ink:#e7eaf4; --muted:#9aa3bf; --line:#2a3148;
+  --accent:#8ea6ff; --accent-ink:#0f1320; --accent-soft:#222c4d;
+  --red:#ff8a84; --red-soft:#3a1f22; --ok:#6fd39c; --ok-soft:#173226; --warn:#f0b75a; --warn-soft:#352a14;
+  --rule:#2c3552; --margin:#6b3a3c;
+  --g1:#a83434; --g2:#9e5810; --g3:#1d7040; --g4:#1f5f97; --g5:#55399e; --g6:#2a3b80;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 6px 18px rgb(0 0 0 / .25);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+#app{min-height:100%;display:flex;flex-direction:column}
+a{color:var(--accent)}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.35;margin:0;text-wrap:balance}
+p{margin:0}
+.wrap{width:100%;max-width:1080px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.num{font-variant-numeric:tabular-nums}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* demo strip + header */
+.demo{background:var(--warn-soft);color:var(--warn);font-size:13px}
+.demo .wrap{padding-block:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);margin-inline-end:auto}
+.brand b{font-family:var(--f-display);font-size:21px;font-weight:700}
+.brand .mark{width:34px;height:34px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.nav{display:flex;align-items:center;gap:4px}
+.nav a.lnk{color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;font-weight:500}
+.nav a.lnk:hover{background:var(--sunk);color:var(--ink)}
+@media (max-width:620px){ .nav a.lnk.opt{display:none} }
+
+/* buttons */
+.btn{appearance:none;border:1px solid transparent;border-radius:9px;padding:9px 16px;font:600 14.5px/1.4 var(--f-body);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.btn.ghost:hover{background:var(--sunk)}
+.btn.soft{background:var(--accent-soft);color:var(--accent)}
+.btn.danger{background:var(--red-soft);color:var(--red)}
+.btn.ok{background:var(--ok-soft);color:var(--ok)}
+.btn.sm{padding:6px 12px;font-size:13.5px}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.55;cursor:progress}
+
+/* hero */
+.hero{padding-block:36px 24px;display:grid;gap:16px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--accent)}
+.hero h1{font-size:clamp(28px,5.4vw,44px);max-width:20ch}
+.hero p.lead{font-size:17px;color:var(--muted);max-width:56ch}
+.hero .ctas{display:flex;gap:10px;flex-wrap:wrap}
+.kinds{display:flex;flex-wrap:wrap;gap:8px}
+.kind-tag{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;padding:5px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.kind-tag svg{width:16px;height:16px;color:var(--accent)}
+
+section.block{padding-block:28px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.sec-head h2{font-size:24px}
+
+/* notebook covers */
+.covers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:760px){ .covers{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px} }
+.cover{--gc:var(--g1);position:relative;display:flex;flex-direction:column;gap:14px;min-height:178px;padding:14px 14px 14px 14px;padding-inline-start:24px;border-radius:6px 14px 14px 6px;background:var(--gc);color:var(--cover-ink);text-decoration:none;box-shadow:var(--shadow);overflow:hidden;transition:transform .18s ease}
+[dir="rtl"] .cover{border-radius:14px 6px 6px 14px}
+.cover::before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:12px;background:rgb(0 0 0 / .2)}
+.cover::after{content:"";position:absolute;inset-block:0;inset-inline-start:12px;width:1px;background:rgb(255 255 255 / .25)}
+.cover:hover{transform:translateY(-3px)}
+.cover .gnum{font-family:var(--f-display);font-size:46px;line-height:1;font-weight:700;opacity:.95}
+.cover .lbl{margin-top:auto;background:var(--surface);color:var(--ink);border-radius:6px;padding:8px 10px;
+  background-image:linear-gradient(to left, transparent 18px, var(--margin) 18px, var(--margin) 19px, transparent 19px),repeating-linear-gradient(to bottom, transparent 0 9px, var(--rule) 9px 10px)}
+.cover .lbl b{display:block;font-family:var(--f-display);font-size:17px;font-weight:700;line-height:1.5}
+.cover .lbl span{font-size:12.5px;color:var(--muted)}
+.cover .own{position:absolute;top:12px;inset-inline-end:12px;font-size:12px;font-weight:600;background:rgb(255 255 255 / .2);padding:2px 9px;border-radius:999px}
+@media (prefers-reduced-motion:reduce){ .cover{transition:none} .cover:hover{transform:none} }
+
+/* steps + pricing */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;counter-reset:st}
+@media (max-width:760px){ .steps{grid-template-columns:1fr} }
+.step{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.step .n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--f-display);font-weight:700}
+.step b{display:block}
+.plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:620px){ .plans{grid-template-columns:1fr} }
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.plan.feat{border:2px solid var(--accent);box-shadow:var(--shadow)}
+.plan .price{font-family:var(--f-display);font-size:34px;font-weight:700;line-height:1.1}
+.plan .price small{font-family:var(--f-body);font-size:14px;font-weight:500;color:var(--muted)}
+.plan ul{margin:0;padding-inline-start:18px;display:grid;gap:4px}
+.badge{display:inline-block;align-self:flex-start;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--accent);color:var(--accent-ink)}
+
+/* page heads + lists */
+.crumbs{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13.5px;color:var(--muted);padding-top:18px}
+.crumbs a{color:var(--muted);text-decoration:none}
+.crumbs a:hover{color:var(--accent)}
+.phead{display:flex;align-items:center;gap:14px;padding-block:12px 18px;flex-wrap:wrap}
+.phead .chip-g{width:52px;height:52px;border-radius:10px;background:var(--gc);color:var(--cover-ink);display:grid;place-items:center;font-family:var(--f-display);font-size:26px;font-weight:700;flex:none}
+.phead .t{min-width:0;flex:1}
+.phead h1{font-size:clamp(22px,4vw,30px)}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink);min-width:0}
+.row:first-child{border-top:0}
+a.row:hover{background:var(--sunk)}
+.row .main{flex:1;min-width:0}
+.row .ttl{font-weight:600;overflow-wrap:anywhere}
+.row .meta{font-size:13px;color:var(--muted);display:flex;gap:6px 10px;flex-wrap:wrap;align-items:center}
+.row .ico{width:40px;height:40px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.row .chev{color:var(--muted)}
+.counts{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.cnt{font-size:12px;padding:1px 8px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.cnt b{color:var(--ink);font-weight:600}
+.soon{font-size:12.5px;color:var(--muted)}
+
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:thin}
+.tab{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:6px 14px;font:500 14px/1.4 var(--f-body);cursor:pointer;white-space:nowrap}
+.tab[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+
+.notice{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-radius:12px;margin-bottom:14px;background:var(--accent-soft);color:var(--ink)}
+.notice.warn{background:var(--warn-soft)}
+.notice.ok{background:var(--ok-soft)}
+.notice .grow{flex:1;min-width:200px}
+
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:1px 9px;border-radius:999px;white-space:nowrap}
+.pill.pending{background:var(--warn-soft);color:var(--warn)}
+.pill.active{background:var(--ok-soft);color:var(--ok)}
+.pill.rejected,.pill.expired{background:var(--red-soft);color:var(--red)}
+.pill.free{background:var(--ok-soft);color:var(--ok)}
+
+/* forms */
+.narrow{max-width:460px;margin-inline:auto;padding-block:32px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:grid;gap:16px}
+.card h1{font-size:24px}
+form.f{display:grid;gap:14px}
+.field{display:grid;gap:5px}
+.field label{font-weight:600;font-size:14px}
+.field .hint{font-size:12.5px;color:var(--muted)}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:10px 12px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input[type="email"],input[type="tel"],input.ltr{direction:ltr;text-align:right}
+input[type="checkbox"],input[type="radio"]{width:auto;accent-color:var(--accent)}
+.err{display:none;padding:10px 12px;border-radius:9px;background:var(--red-soft);color:var(--red);font-size:14px}
+.err.on{display:block}
+.alt{text-align:center;font-size:14px;color:var(--muted)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:520px){ .two{grid-template-columns:1fr} }
+.choice{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:11px;cursor:pointer;background:var(--surface)}
+.choice:has(input:checked){border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.choice input{margin-top:5px}
+.choice b{display:block}
+.payto{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-radius:11px;background:var(--sunk)}
+.payto code{font:600 18px/1.3 ui-monospace,Menlo,Consolas,monospace;direction:ltr;user-select:all;letter-spacing:.04em}
+.demo-btns{display:grid;gap:8px;padding-top:4px;border-top:1px dashed var(--line)}
+
+/* account + admin */
+.page{padding-block:8px 40px;display:grid;gap:18px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:14.5px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;overflow-wrap:anywhere}
+.admin-tabs{display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.atab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 12px;font:600 14.5px/1.4 var(--f-body);color:var(--muted);cursor:pointer;white-space:nowrap;display:inline-flex;gap:6px;align-items:center}
+.atab[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.atab .c{font-size:11.5px;background:var(--red);color:#fff;border-radius:999px;padding:0 7px}
+.req{display:grid;gap:10px;padding:14px 16px;border-top:1px solid var(--line)}
+.req:first-child{border-top:0}
+.req .top{display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center}
+.req .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.req .acts .field{min-width:150px}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+
+footer.foot{margin-top:auto;border-top:1px solid var(--line);background:var(--surface)}
+footer.foot .wrap{padding-block:18px;display:flex;gap:8px 20px;flex-wrap:wrap;justify-content:space-between;font-size:13.5px;color:var(--muted)}
+footer.foot .sel{user-select:all;direction:ltr;unicode-bidi:isolate}
+
+.toast{position:fixed;inset-inline:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:50;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.toast div{background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;box-shadow:var(--shadow);font-size:14.5px;max-width:520px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
+.toast div.on{opacity:1;transform:none}
+.loading{padding:48px 0;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app" dir="rtl" lang="ar">
+  <div id="demo"></div>
+  <header class="top"><div class="wrap" id="hdr"></div></header>
+  <main id="main"></main>
+  <footer class="foot"><div class="wrap" id="ftr"></div></footer>
+  <div class="toast" aria-live="polite"><div id="toast"></div></div>
+</div>
+
+<script>
+/* ============================================================
+   الإعدادات — بدّل هذي القيم متاعك
+   ============================================================ */
+window.CONFIG = {
+  // من Supabase: Project Settings ← API   (خلّيهم فارغين = نسخة تجريبية)
+  SUPABASE_URL: "https://dtswalzriubjmroimbfh.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3dhbHpyaXViam1yb2ltYmZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNTc5OTQsImV4cCI6MjEwNzYzMzk5NH0.JC7vkczDO2JoyitBzpE2jwJASMxqM74g7b_cJ9C57-4",
+
+  SITE_NAME: "زاد المعلّم",
+  PRICES: { grade: 30, all: 120 },          // بالدينار، للسنة الدراسية
+  CURRENCY: "د.ت",
+  D17_NUMBER: "00 000 000",                 // رقم D17 متاعك
+  TRANSFER_INFO: "RIB: 00 000 0000000000000 00",  // الحساب البنكي أو البريدي
+  CONTACT_PHONE: "+216 00 000 000",         // للتواصل (واتساب)
+  ACTIVATION_DELAY: "خلال 24 ساعة"
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+"use strict";
+const C = window.CONFIG;
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const GRADE = ["", "السنة الأولى", "السنة الثانية", "السنة الثالثة", "السنة الرابعة", "السنة الخامسة", "السنة السادسة"];
+const KINDS = [
+  { id: "mudhakkira",   label: "مذكّرات",          one: "مذكّرة" },
+  { id: "presentation", label: "عروض PowerPoint",   one: "عرض" },
+  { id: "planning",     label: "تخطيطات وتوزيعات",  one: "تخطيط" },
+  { id: "evaluation",   label: "تقييمات وتمارين",   one: "تقييم" }
+];
+const KIND = Object.fromEntries(KINDS.map(k => [k.id, k]));
+const P = {
+  doc: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+  slides: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 16v4M8 20h8M10 8l4 2-4 2z"/>',
+  plan: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7 14h4M7 17h7"/>',
+  eval: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8.5 12l2.2 2.2L15.5 9.5"/>',
+  lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  down: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+  chev: '<path d="M15 6l-6 6 6 6"/>',
+  copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  book: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18M12.5 8h3.5M12.5 12h3.5"/>'
+};
+const KICON = { mudhakkira: "doc", presentation: "slides", planning: "plan", evaluation: "eval" };
+const icon = (n, cls) => `<svg class="i ${cls || ""}" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+const money = n => `${Number(n).toLocaleString("fr-TN")} ${C.CURRENCY}`;
+const fmtDate = d => d ? new Date(d).toLocaleDateString("ar-TN-u-nu-latn", { day: "numeric", month: "long", year: "numeric" }) : "";
+const today = () => new Date().toISOString().slice(0, 10);
+function defaultExpiry(){ const d = new Date(); const y = d.getMonth() >= 6 ? d.getFullYear() + 1 : d.getFullYear(); return `${y}-06-30`; }
+const planName = s => s.plan === "all" ? "كل الأقسام" : `اشتراك ${GRADE[s.grade]}`;
+
+function arError(e){
+  const m = String(e && (e.message || e.error_description || e) || "");
+  if (/Invalid login credentials/i.test(m)) return "البريد الإلكتروني أو كلمة السرّ غير صحيحة.";
+  if (/already registered|already exists/i.test(m)) return "هذا البريد مسجّل من قبل. سجّل الدخول أو استرجع كلمة السرّ.";
+  if (/Email not confirmed/i.test(m)) return "لم يتمّ تأكيد البريد بعد. افتح الرسالة التي وصلتك واضغط على رابط التأكيد.";
+  if (/at least 6/i.test(m)) return "كلمة السرّ يجب أن تكون 6 أحرف على الأقل.";
+  if (/rate limit|too many/i.test(m)) return "محاولات كثيرة. انتظر دقيقة ثم أعد المحاولة.";
+  if (/not found|row-level|permission|policy/i.test(m)) return "ليس لديك صلاحية لهذه العملية. تحقّق من اشتراكك أو أعد تسجيل الدخول.";
+  if (/Failed to fetch|NetworkError/i.test(m)) return "تعذّر الاتصال بالخادم. تحقّق من الإنترنت ثم أعد المحاولة.";
+  return "حدث خطأ: " + m;
+}
+
+/* ============================================================
+   طبقة المعطيات: Supabase الحقيقي أو النسخة التجريبية
+   ============================================================ */
+function supabaseApi(){
+  const sb = window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
+  const here = location.origin + location.pathname;
+  const ok = r => { if (r.error) throw r.error; return r.data; };
+  return {
+    demo: false,
+    async session(){ return ok(await sb.auth.getSession()).session; },
+    onAuth(cb){ sb.auth.onAuthStateChange((ev, s) => setTimeout(() => cb(ev, s), 0)); },
+    async signUp({ email, password, full_name, phone }){
+      return ok(await sb.auth.signUp({ email, password, options: { data: { full_name, phone }, emailRedirectTo: here } }));
+    },
+    async signIn(email, password){ return ok(await sb.auth.signInWithPassword({ email, password })).session; },
+    async signOut(){ await sb.auth.signOut(); },
+    async resetPassword(email){ ok(await sb.auth.resetPasswordForEmail(email, { redirectTo: here })); },
+    async updatePassword(password){ ok(await sb.auth.updateUser({ password })); },
+    async profile(id){ return ok(await sb.from("profiles").select("*").eq("id", id).maybeSingle()); },
+    async subjects(){ return ok(await sb.from("subjects").select("*").order("grade").order("sort").order("id")); },
+    async counts(){ return ok(await sb.from("resource_counts").select("*")); },
+    async resources(subjectId){ return ok(await sb.from("resources").select("*").eq("subject_id", subjectId).order("created_at", { ascending: false })); },
+    async downloadUrl(r){ return ok(await sb.storage.from("resources").createSignedUrl(r.file_path, 300, { download: r.file_name || true })).signedUrl; },
+    async mySubs(uid){ return ok(await sb.from("subscriptions").select("*").eq("user_id", uid).order("created_at", { ascending: false })); },
+    async requestSub(row){ ok(await sb.from("subscriptions").insert(row)); },
+    async allSubs(){ return ok(await sb.from("subscriptions").select("*, profiles(full_name,email,phone)").order("created_at", { ascending: false })); },
+    async setSub(id, patch){ ok(await sb.from("subscriptions").update(patch).eq("id", id)); },
+    async upload({ grade, subject_id, kind, title, file, is_free }){
+      const ext = ((file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "")) || "bin";
+      const path = `${grade}/${subject_id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      ok(await sb.storage.from("resources").upload(path, file, { contentType: file.type || undefined }));
+      const r = await sb.from("resources").insert({ subject_id, kind, title, file_path: path, file_name: file.name, is_free });
+      if (r.error){ await sb.storage.from("resources").remove([path]); throw r.error; }
+    },
+    async deleteResource(r){ ok(await sb.from("resources").delete().eq("id", r.id)); await sb.storage.from("resources").remove([r.file_path]); },
+    async addSubject(row){ ok(await sb.from("subjects").insert(row)); },
+    async deleteSubject(id){ ok(await sb.from("subjects").delete().eq("id", id)); },
+    async profiles(){ return ok(await sb.from("profiles").select("*").order("created_at", { ascending: false })); }
+  };
+}
+
+function demoApi(){
+  const wait = (v) => new Promise(r => setTimeout(() => r(v), 160));
+  const now = Date.now(), ago = d => new Date(now - d * 864e5).toISOString();
+  let seq = 1000, listener = null, session = null;
+  const users = [
+    { id: "u-admin", email: "admin@demo.tn", full_name: "حساب المدير (تجربة)", phone: "", is_admin: true, created_at: ago(90) },
+    { id: "u-me", email: "moualem@demo.tn", full_name: "معلّم تجريبي (أنت)", phone: "+216 20 000 000", is_admin: false, created_at: ago(1) },
+    { id: "u-2", email: "teacher.one@demo.tn", full_name: "مشترك تجريبي 1", phone: "+216 22 111 111", is_admin: false, created_at: ago(3) },
+    { id: "u-3", email: "teacher.two@demo.tn", full_name: "مشترك تجريبي 2", phone: "+216 55 222 222", is_admin: false, created_at: ago(20) }
+  ];
+  const subjects = [];
+  const base = ["العربية", "الرياضيات", "الإيقاظ العلمي", "التربية الإسلامية", "التربية التكنولوجية", "التربية التشكيلية", "التربية الموسيقية", "التربية البدنية"];
+  for (let g = 1; g <= 6; g++){
+    base.forEach((n, i) => subjects.push({ id: seq++, grade: g, name: n, sort: i < 4 ? i + 1 : i + 2 }));
+    if (g >= 2) subjects.push({ id: seq++, grade: g, name: "الفرنسية", sort: 5 });
+    if (g >= 5){ subjects.push({ id: seq++, grade: g, name: "الإنجليزية", sort: 5 }); subjects.push({ id: seq++, grade: g, name: "التنشئة الاجتماعية", sort: 5 }); }
+  }
+  subjects.sort((a, b) => a.grade - b.grade || a.sort - b.sort || a.id - b.id);
+  const resources = [];
+  const T = {
+    "العربية": [["mudhakkira", "تواصل شفوي – الوحدة 1"], ["mudhakkira", "قراءة – الوحدة 1"], ["mudhakkira", "إنتاج كتابي – الوحدة 1"], ["presentation", "عرض نصّ القراءة – الوحدة 1"], ["planning", "التخطيط السنوي للعربية"], ["evaluation", "تقييم نهاية الثلاثي الأول"]],
+    "الرياضيات": [["mudhakkira", "الأعداد – الحصّة 1"], ["mudhakkira", "الجمع والطرح – الحصّة 2"], ["presentation", "عرض: الأشكال الهندسية"], ["planning", "توزيع الثلاثي الأول"], ["evaluation", "تمارين علاجية – الأعداد"], ["evaluation", "فرض المراقبة 1"]],
+    "الإيقاظ العلمي": [["mudhakkira", "الكائنات الحيّة – الحصّة 1"], ["presentation", "عرض: دورة الماء"], ["evaluation", "تقييم الثلاثي الأول"]],
+    "الفرنسية": [["mudhakkira", "Lecture – Module 1"], ["presentation", "Vocabulaire illustré – Module 1"], ["planning", "Planification annuelle"]]
+  };
+  let ri = 0;
+  subjects.forEach(s => (T[s.name] || []).forEach(([kind, title], j) => {
+    resources.push({ id: seq++, subject_id: s.id, kind, title, file_path: `demo/${s.id}/${j}`, file_name: title + (kind === "presentation" ? ".pptx" : ".docx"), is_free: s.name === "العربية" && j === 0, created_at: ago(30 - (ri++ % 28)) });
+  }));
+  const g3 = subjects.find(s => s.grade === 3).grade;
+  const subs = [
+    { id: seq++, user_id: "u-2", plan: "grade", grade: g3, status: "pending", payment_method: "D17", payment_ref: "D17-48213977", amount: C.PRICES.grade, expires_at: null, created_at: ago(0.2) },
+    { id: seq++, user_id: "u-3", plan: "all", grade: null, status: "active", payment_method: "حوالة", payment_ref: "VIR-20931", amount: C.PRICES.all, expires_at: defaultExpiry(), created_at: ago(18) }
+  ];
+  const withProfile = s => ({ ...s, profiles: users.find(u => u.id === s.user_id) });
+  const emit = ev => listener && setTimeout(() => listener(ev, session), 0);
+  const login = u => { session = { user: { id: u.id, email: u.email } }; emit("SIGNED_IN"); return session; };
+  return {
+    demo: true,
+    async session(){ return session; },
+    onAuth(cb){ listener = cb; },
+    async signUp({ email, full_name, phone }){
+      let u = users.find(x => x.email === email);
+      if (!u){ u = { id: "u-" + seq++, email, full_name, phone, is_admin: false, created_at: new Date().toISOString() }; users.push(u); }
+      return wait({ session: login(u) });
+    },
+    async signIn(email){ let u = users.find(x => x.email === email) || users[1]; return wait(login(u)); },
+    async demoAs(who){ return wait(login(users.find(u => u.id === who))); },
+    async signOut(){ session = null; emit("SIGNED_OUT"); },
+    async resetPassword(){ return wait(); },
+    async updatePassword(){ return wait(); },
+    async profile(id){ return wait({ ...users.find(u => u.id === id) }); },
+    async subjects(){ return wait(subjects.map(s => ({ ...s }))); },
+    async counts(){
+      const m = {}; resources.forEach(r => { const k = r.subject_id + "|" + r.kind; m[k] = (m[k] || 0) + 1; });
+      return wait(Object.entries(m).map(([k, n]) => { const [subject_id, kind] = k.split("|"); return { subject_id: +subject_id, kind, n }; }));
+    },
+    async resources(id){ return wait(resources.filter(r => r.subject_id === id).sort((a, b) => b.created_at.localeCompare(a.created_at)).map(r => ({ ...r }))); },
+    async downloadUrl(){ return wait(null); },
+    async mySubs(uid){ return wait(subs.filter(s => s.user_id === uid).map(s => ({ ...s })).reverse()); },
+    async requestSub(row){ subs.push({ id: seq++, user_id: session.user.id, status: "pending", expires_at: null, created_at: new Date().toISOString(), grade: null, ...row }); return wait(); },
+    async allSubs(){ return wait(subs.map(withProfile).reverse()); },
+    async setSub(id, patch){ Object.assign(subs.find(s => s.id === id), patch); return wait(); },
+    async upload({ subject_id, kind, title, file, is_free }){ resources.push({ id: seq++, subject_id, kind, title, file_path: "demo/new/" + seq, file_name: file.name, is_free, created_at: new Date().toISOString() }); return wait(); },
+    async deleteResource(r){ const i = resources.findIndex(x => x.id === r.id); if (i >= 0) resources.splice(i, 1); return wait(); },
+    async addSubject(row){ subjects.push({ id: seq++, ...row }); subjects.sort((a, b) => a.grade - b.grade || a.sort - b.sort || a.id - b.id); return wait(); },
+    async deleteSubject(id){ const i = subjects.findIndex(s => s.id === id); if (i >= 0) subjects.splice(i, 1); for (let j = resources.length - 1; j >= 0; j--) if (resources[j].subject_id === id) resources.splice(j, 1); return wait(); },
+    async profiles(){ return wait(users.slice().reverse()); }
+  };
+}
+
+const DEMO = !C.SUPABASE_URL || !C.SUPABASE_ANON_KEY || !window.supabase;
+const api = DEMO ? demoApi() : supabaseApi();
+
+/* ============================================================
+   الحالة والتنقّل
+   ============================================================ */
+const S = {
+  session: null, profile: null, subs: [], subjects: [], counts: {},
+  route: "home", param: null, recovery: false, afterLogin: null,
+  kindTab: "all", res: {}, preGrade: null,
+  adm: { tab: "requests", grade: 1, subject: null, subjGrade: 1 }, admSubs: null
+};
+const ROUTES = ["home", "login", "register", "forgot", "account", "subscribe", "admin"];
+function parseHash(){
+  const h = decodeURIComponent((location.hash || "").slice(1));
+  const m = h.match(/^(grade|subject)-(\d+)$/);
+  if (m) return { route: m[1], param: +m[2] };
+  if (h === "grades" || h === "pricing") return { route: "home", param: h };
+  return { route: ROUTES.includes(h) ? h : "home", param: null };
+}
+function go(h){ if (location.hash === "#" + h){ Object.assign(S, parseHash()); render(); } else location.hash = h; }
+window.addEventListener("hashchange", () => {
+  const prev = S.route + S.param; Object.assign(S, parseHash());
+  if (S.route === "subject" && prev !== S.route + S.param) S.kindTab = "all";
+  render(true);
+});
+
+const activeSubs = () => S.subs.filter(s => s.status === "active" && (!s.expires_at || s.expires_at >= today()));
+const hasAccess = g => !!(S.profile && S.profile.is_admin) || activeSubs().some(s => s.plan === "all" || s.grade === g);
+const subjectsOf = g => S.subjects.filter(s => s.grade === g);
+const countOf = (sid, kind) => (S.counts[sid] || {})[kind] || 0;
+const totalOf = sid => KINDS.reduce((a, k) => a + countOf(sid, k.id), 0);
+
+async function loadUser(){
+  if (!S.session){ S.profile = null; S.subs = []; return; }
+  const uid = S.session.user.id;
+  const [p, subs] = await Promise.all([api.profile(uid), api.mySubs(uid)]);
+  S.profile = p; S.subs = subs || [];
+}
+async function loadCatalog(){
+  const [subjects, rows] = await Promise.all([api.subjects(), api.counts()]);
+  S.subjects = subjects || []; S.counts = {};
+  (rows || []).forEach(r => { (S.counts[r.subject_id] = S.counts[r.subject_id] || {})[r.kind] = r.n; });
+}
+
+/* ============================================================
+   الواجهات
+   ============================================================ */
+function header(){
+  const logged = !!S.session;
+  return `
+  <a class="brand" href="#home"><span class="mark">${icon("book")}</span><b>${esc(C.SITE_NAME)}</b></a>
+  <nav class="nav" aria-label="القائمة">
+    <a class="lnk opt" href="#grades">الأقسام</a>
+    <a class="lnk opt" href="#pricing">الأسعار</a>
+    ${S.profile && S.profile.is_admin ? `<a class="lnk" href="#admin">لوحة التحكّم</a>` : ""}
+    ${logged ? `<a class="btn soft sm" href="#account">${icon("user")}حسابي</a>`
+             : `<a class="btn primary sm" href="#login">تسجيل الدخول</a>`}
+  </nav>`;
+}
+function footer(){
+  return `<span>${esc(C.SITE_NAME)} · موارد بيداغوجية للتعليم الابتدائي</span>
+  <span>للتواصل: <span class="sel">${esc(C.CONTACT_PHONE)}</span></span>`;
+}
+
+function coverCard(g){
+  const subs = subjectsOf(g);
+  const n = subs.reduce((a, s) => a + totalOf(s.id), 0);
+  return `<a class="cover" style="--gc:var(--g${g})" href="#grade-${g}">
+    ${S.session && hasAccess(g) ? `<span class="own">مفعّل</span>` : ""}
+    <span class="gnum">${g}</span>
+    <span class="lbl"><b>${GRADE[g]}</b><span class="num">${subs.length} مادة · ${n} ملف</span></span>
+  </a>`;
+}
+
+function vHome(){
+  const kinds = KINDS.map(k => `<span class="kind-tag">${icon(KICON[k.id])}${k.label}</span>`).join("");
+  return `
+  <div class="wrap">
+    <section class="hero">
+      <span class="eyebrow">للمعلّمين في المدرسة الابتدائية</span>
+      <h1>مذكّرات وعروض وتقييمات جاهزة، من السنة الأولى إلى السادسة</h1>
+      <p class="lead">اشترك في قسمك أو في كلّ الأقسام، وحمّل ملفّاتك بصيغة Word وPowerPoint متى احتجتها. كلّ الموادّ مرتّبة حسب القسم والنوع.</p>
+      <div class="kinds">${kinds}</div>
+      <div class="ctas">
+        <a class="btn primary" href="#grades">اختر قسمك</a>
+        ${S.session ? `<a class="btn ghost" href="#subscribe">اشترك الآن</a>` : `<a class="btn ghost" href="#register">إنشاء حساب</a>`}
+      </div>
+    </section>
+
+    <section class="block" id="sec-grades">
+      <div class="sec-head"><h2>الأقسام</h2><span class="muted small">اضغط على القسم لترى موادّه وملفّاته</span></div>
+      <div class="covers">${[1,2,3,4,5,6].map(coverCard).join("")}</div>
+    </section>
+
+    <section class="block">
+      <div class="sec-head"><h2>كيف تشترك؟</h2></div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div><b>أنشئ حسابك</b><span class="muted small">بالبريد الإلكتروني وكلمة سرّ.</span></div></div>
+        <div class="step"><span class="n">2</span><div><b>ادفع وأرسل رقم العملية</b><span class="muted small">عبر D17 أو حوالة، ثم اكتب رقم العملية في صفحة الاشتراك.</span></div></div>
+        <div class="step"><span class="n">3</span><div><b>نفعّل اشتراكك</b><span class="muted small">${esc(C.ACTIVATION_DELAY)}، وتحمّل كلّ ملفّات القسم.</span></div></div>
+      </div>
+    </section>
+
+    <section class="block" id="sec-pricing">
+      <div class="sec-head"><h2>الأسعار</h2><span class="muted small">صالحة إلى آخر السنة الدراسية (30 جوان)</span></div>
+      <div class="plans">
+        <div class="plan">
+          <b>اشتراك قسم واحد</b>
+          <div class="price num">${money(C.PRICES.grade)} <small>/ السنة الدراسية</small></div>
+          <ul><li>كلّ موادّ القسم الذي تختاره</li><li>المذكّرات والعروض والتخطيطات والتقييمات</li><li>كلّ الملفّات الجديدة طوال السنة</li></ul>
+          <a class="btn ghost" href="#subscribe" data-act="plan" data-plan="grade">اختر هذا الاشتراك</a>
+        </div>
+        <div class="plan feat">
+          <span class="badge">الأوفر</span>
+          <b>كلّ الأقسام</b>
+          <div class="price num">${money(C.PRICES.all)} <small>/ السنة الدراسية</small></div>
+          <ul><li>الأقسام الستّة بكلّ موادّها</li><li>مناسب لمن يدرّس أكثر من قسم</li><li>كلّ الملفّات الجديدة طوال السنة</li></ul>
+          <a class="btn primary" href="#subscribe" data-act="plan" data-plan="all">اختر هذا الاشتراك</a>
+        </div>
+      </div>
+    </section>
+  </div>`;
+}
+
+function vGrade(g){
+  if (!(g >= 1 && g <= 6)) return vHome();
+  const subs = subjectsOf(g);
+  const access = S.session && hasAccess(g);
+  const rows = subs.length ? subs.map(s => {
+    const total = totalOf(s.id);
+    const chips = KINDS.filter(k => countOf(s.id, k.id)).map(k => `<span class="cnt">${k.label} <b class="num">${countOf(s.id, k.id)}</b></span>`).join("");
+    return `<a class="row" href="#subject-${s.id}">
+      <div class="main"><div class="ttl">${esc(s.name)}</div>
+        ${total ? `<div class="counts">${chips}</div>` : `<span class="soon">الملفّات قريبًا</span>`}
+      </div>${icon("chev", "chev")}</a>`;
+  }).join("") : `<div class="empty">لم تُضف موادّ لهذا القسم بعد.</div>`;
+  return `<div class="wrap">
+    <nav class="crumbs"><a href="#home">الرئيسية</a>›<span>${GRADE[g]}</span></nav>
+    <div class="phead" style="--gc:var(--g${g})"><span class="chip-g">${g}</span>
+      <div class="t"><h1>${GRADE[g]}</h1><span class="muted small num">${subs.length} مادة</span></div>
+      ${access ? `<span class="pill active">اشتراكك مفعّل</span>` : `<a class="btn primary" href="#subscribe" data-act="pregrade" data-g="${g}">اشترك في هذا القسم</a>`}
+    </div>
+    <div class="list">${rows}</div>
+    <div style="height:40px"></div>
+  </div>`;
+}
+
+async function vSubject(id){
+  const s = S.subjects.find(x => x.id === id);
+  if (!s) return `<div class="wrap"><div class="empty">هذه المادة غير موجودة.</div></div>`;
+  if (!S.res[id]) S.res[id] = await api.resources(id);
+  const all = S.res[id];
+  const tab = S.kindTab;
+  const list = tab === "all" ? all : all.filter(r => r.kind === tab);
+  const access = S.session && hasAccess(s.grade);
+  let notice = "";
+  if (!S.session) notice = `<div class="notice">${icon("lock")}<span class="grow">سجّل الدخول لتحميل الملفّات. الملفّات المجانية متاحة لكلّ من لديه حساب.</span><a class="btn primary sm" href="#login" data-act="remember">تسجيل الدخول</a></div>`;
+  else if (!access) notice = `<div class="notice warn">${icon("lock")}<span class="grow">ملفّات ${GRADE[s.grade]} متاحة للمشتركين. اشترك لتحميل كلّ ملفّات القسم.</span><a class="btn primary sm" href="#subscribe" data-act="pregrade" data-g="${s.grade}">اشترك</a></div>`;
+  const tabs = [`<button class="tab" data-act="kind" data-k="all" aria-pressed="${tab === "all"}">الكلّ <span class="num">${all.length}</span></button>`]
+    .concat(KINDS.map(k => { const n = all.filter(r => r.kind === k.id).length; return `<button class="tab" data-act="kind" data-k="${k.id}" aria-pressed="${tab === k.id}">${k.label} <span class="num">${n}</span></button>`; })).join("");
+  const rows = list.length ? list.map(r => {
+    const can = S.session && (r.is_free || access);
+    return `<div class="row">
+      <span class="ico">${icon(KICON[r.kind])}</span>
+      <div class="main"><div class="ttl">${esc(r.title)}</div>
+        <div class="meta"><span>${KIND[r.kind].one}</span><span>·</span><span>${fmtDate(r.created_at)}</span>${r.is_free ? `<span class="pill free">مجاني</span>` : ""}</div></div>
+      ${can ? `<button class="btn soft sm" data-act="download" data-id="${r.id}" data-s="${id}">${icon("down")}تحميل</button>`
+            : `<button class="btn ghost sm" data-act="locked" data-g="${s.grade}" aria-label="مقفل">${icon("lock")}</button>`}
+    </div>`;
+  }).join("") : `<div class="empty">لا توجد ملفّات من هذا النوع بعد.</div>`;
+  return `<div class="wrap">
+    <nav class="crumbs"><a href="#home">الرئيسية</a>›<a href="#grade-${s.grade}">${GRADE[s.grade]}</a>›<span>${esc(s.name)}</span></nav>
+    <div class="phead" style="--gc:var(--g${s.grade})"><span class="chip-g">${s.grade}</span>
+      <div class="t"><h1>${esc(s.name)}</h1><span class="muted small">${GRADE[s.grade]}</span></div></div>
+    ${notice}
+    <div class="tabs" role="group" aria-label="نوع الملف">${tabs}</div>
+    <div class="list">${rows}</div>
+    <div style="height:40px"></div>
+  </div>`;
+}
+
+function vLogin(){
+  if (S.session) return vAccount();
+  return `<div class="wrap narrow"><div class="card">
+    <h1>تسجيل الدخول</h1>
+    <form class="f" data-form="login" novalidate>
+      <div class="err" role="alert"></div>
+      <div class="field"><label for="li-email">البريد الإلكتروني</label><input id="li-email" name="email" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="li-pw">كلمة السرّ</label><input id="li-pw" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary block" type="submit">دخول</button>
+      <a class="small" href="#forgot">نسيت كلمة السرّ؟</a>
+    </form>
+    <p class="alt">ليس لديك حساب؟ <a href="#register">أنشئ حسابًا</a></p>
+    ${api.demo ? `<div class="demo-btns"><span class="small muted">في النسخة التجريبية، جرّب مباشرة:</span>
+      <button class="btn ghost" data-act="demoas" data-who="u-me">الدخول كمعلّم مشترك</button>
+      <button class="btn ghost" data-act="demoas" data-who="u-admin">الدخول كمدير (لوحة التحكّم)</button></div>` : ""}
+  </div></div>`;
+}
+function vRegister(){
+  if (S.session) return vAccount();
+  return `<div class="wrap narrow"><div class="card">
+    <h1>إنشاء حساب</h1>
+    <form class="f" data-form="register" novalidate>
+      <div class="err" role="alert"></div>
+      <div class="field"><label for="rg-name">الاسم واللقب</label><input id="rg-name" name="full_name" autocomplete="name" required></div>
+      <div class="field"><label for="rg-phone">رقم الهاتف</label><input id="rg-phone" name="phone" type="tel" autocomplete="tel" placeholder="+216 ..."><span class="hint">نستعمله فقط للتواصل حول اشتراكك.</span></div>
+      <div class="field"><label for="rg-email">البريد الإلكتروني</label><input id="rg-email" name="email" type="email" autocomplete="email" required></div>
+      <div class="two">
+        <div class="field"><label for="rg-pw">كلمة السرّ</label><input id="rg-pw" name="password" type="password" autocomplete="new-password" minlength="6" required></div>
+        <div class="field"><label for="rg-pw2">أعد كتابتها</label><input id="rg-pw2" name="password2" type="password" autocomplete="new-password" required></div>
+      </div>
+      <button class="btn primary block" type="submit">إنشاء الحساب</button>
+    </form>
+    <p class="alt">لديك حساب؟ <a href="#login">سجّل الدخول</a></p>
+  </div></div>`;
+}
+function vForgot(){
+  return `<div class="wrap narrow"><div class="card">
+    <h1>استرجاع كلمة السرّ</h1>
+    <p class="muted">اكتب بريدك الإلكتروني وسنرسل لك رابطًا لتعيين كلمة سرّ جديدة.</p>
+    <form class="f" data-form="forgot" novalidate>
+      <div class="err" role="alert"></div>
+      <div class="field"><label for="fg-email">البريد الإلكتروني</label><input id="fg-email" name="email" type="email" autocomplete="email" required></div>
+      <button class="btn primary block" type="submit">أرسل الرابط</button>
+    </form>
+    <p class="alt"><a href="#login">رجوع لتسجيل الدخول</a></p>
+  </div></div>`;
+}
+function vRecovery(){
+  return `<div class="wrap narrow"><div class="card">
+    <h1>كلمة سرّ جديدة</h1>
+    <form class="f" data-form="newpw" novalidate>
+      <div class="err" role="alert"></div>
+      <div class="field"><label for="np-pw">كلمة السرّ الجديدة</label><input id="np-pw" name="password" type="password" autocomplete="new-password" minlength="6" required></div>
+      <button class="btn primary block" type="submit">حفظ</button>
+    </form>
+  </div></div>`;
+}
+
+function subStatus(s){
+  if (s.status === "active" && s.expires_at && s.expires_at < today()) return `<span class="pill expired">منتهي</span>`;
+  return { pending: `<span class="pill pending">في انتظار التفعيل</span>`, active: `<span class="pill active">مفعّل</span>`, rejected: `<span class="pill rejected">مرفوض</span>` }[s.status] || "";
+}
+function vAccount(){
+  const p = S.profile || {};
+  const subs = S.subs.length ? S.subs.map(s => `<div class="row"><div class="main">
+      <div class="ttl">${planName(s)}</div>
+      <div class="meta"><span class="num">${s.amount ? money(s.amount) : ""}</span>${s.payment_method ? `<span>· ${esc(s.payment_method)}</span>` : ""}<span>· طُلب في ${fmtDate(s.created_at)}</span>${s.status === "active" && s.expires_at ? `<span>· صالح إلى ${fmtDate(s.expires_at)}</span>` : ""}</div>
+    </div>${subStatus(s)}</div>`).join("") : `<div class="empty">ليس لديك اشتراك بعد.</div>`;
+  return `<div class="wrap page">
+    <nav class="crumbs"><a href="#home">الرئيسية</a>›<span>حسابي</span></nav>
+    <div class="card">
+      <h1>${esc(p.full_name || "حسابي")}</h1>
+      <dl class="kv"><dt>البريد</dt><dd>${esc(p.email || S.session.user.email)}</dd><dt>الهاتف</dt><dd>${esc(p.phone || "—")}</dd></dl>
+    </div>
+    <div>
+      <div class="sec-head"><h2>اشتراكاتي</h2><a class="btn primary sm" href="#subscribe">اشتراك جديد</a></div>
+      <div class="list">${subs}</div>
+    </div>
+    <div><button class="btn ghost" data-act="logout">تسجيل الخروج</button></div>
+  </div>`;
+}
+
+function vSubscribe(){
+  const pending = S.subs.find(s => s.status === "pending");
+  const pre = S.preGrade || 3;
+  const plan = S.prePlan || "grade";
+  return `<div class="wrap narrow">
+    <div class="card">
+      <h1>اشتراك جديد</h1>
+      ${pending ? `<div class="notice warn">لديك طلب (${planName(pending)}) في انتظار التفعيل. سنفعّله ${esc(C.ACTIVATION_DELAY)}.</div>` : ""}
+      <form class="f" data-form="subscribe" novalidate>
+        <div class="err" role="alert"></div>
+        <div class="field"><span style="font-weight:600">نوع الاشتراك</span>
+          <label class="choice"><input type="radio" name="plan" value="grade" ${plan === "grade" ? "checked" : ""} data-change="plan">
+            <span><b>قسم واحد · <span class="num">${money(C.PRICES.grade)}</span></b><span class="small muted">كلّ موادّ القسم الذي تختاره</span></span></label>
+          <label class="choice"><input type="radio" name="plan" value="all" ${plan === "all" ? "checked" : ""} data-change="plan">
+            <span><b>كلّ الأقسام · <span class="num">${money(C.PRICES.all)}</span></b><span class="small muted">الأقسام الستّة بكلّ موادّها</span></span></label>
+        </div>
+        <div class="field" id="grade-field" ${plan === "all" ? "hidden" : ""}><label for="sb-grade">القسم</label>
+          <select id="sb-grade" name="grade">${[1,2,3,4,5,6].map(g => `<option value="${g}" ${g === pre ? "selected" : ""}>${GRADE[g]}</option>`).join("")}</select></div>
+        <div class="field"><span style="font-weight:600">طريقة الدفع</span>
+          <label class="choice"><input type="radio" name="method" value="D17" checked data-change="method"><span><b>D17</b><span class="small muted">أرسل المبلغ إلى الرقم أسفله</span></span></label>
+          <label class="choice"><input type="radio" name="method" value="حوالة" data-change="method"><span><b>حوالة بنكية أو بريدية</b></span></label>
+        </div>
+        <div class="payto" id="payto">${payto("D17")}</div>
+        <div class="field"><label for="sb-ref">رقم العملية</label><input id="sb-ref" name="ref" class="ltr" required placeholder="مثال: 48213977"><span class="hint">تجده في رسالة التأكيد بعد الدفع. نستعمله للتثبّت من دفعتك.</span></div>
+        <button class="btn primary block" type="submit">أرسل طلب الاشتراك</button>
+      </form>
+    </div>
+  </div>`;
+}
+function payto(m){
+  const v = m === "D17" ? C.D17_NUMBER : C.TRANSFER_INFO;
+  return `<span class="small muted">${m === "D17" ? "رقم D17:" : "الحساب:"}</span><code id="payval">${esc(v)}</code>
+    <button type="button" class="btn ghost sm" data-act="copy" data-v="${esc(v)}">${icon("copy")}نسخ</button>`;
+}
+
+async function vAdmin(){
+  if (!S.profile || !S.profile.is_admin) return `<div class="wrap"><div class="empty">هذه الصفحة للمدير فقط.</div></div>`;
+  if (!S.admSubs) S.admSubs = await api.allSubs();
+  const a = S.adm;
+  const pendingN = S.admSubs.filter(s => s.status === "pending").length;
+  const tabs = [["requests", "الطلبات", pendingN], ["subs", "المشتركون"], ["files", "الملفّات"], ["subjects", "الموادّ"]]
+    .map(([id, l, c]) => `<button class="atab" data-act="atab" data-t="${id}" aria-pressed="${a.tab === id}">${l}${c ? `<span class="c num">${c}</span>` : ""}</button>`).join("");
+  let body = "";
+  if (a.tab === "requests") body = admRequests(S.admSubs.filter(s => s.status === "pending"));
+  else if (a.tab === "subs") body = admSubs(S.admSubs.filter(s => s.status !== "pending"));
+  else if (a.tab === "files") body = await admFiles();
+  else body = admSubjects();
+  return `<div class="wrap page">
+    <nav class="crumbs"><a href="#home">الرئيسية</a>›<span>لوحة التحكّم</span></nav>
+    <h1 style="font-size:26px">لوحة التحكّم</h1>
+    <div class="admin-tabs" role="group">${tabs}</div>
+    ${body}
+  </div>`;
+}
+function who(s){ const p = s.profiles || {}; return `<b>${esc(p.full_name || "—")}</b><span class="muted small" style="direction:ltr;unicode-bidi:isolate">${esc(p.email || "")}</span>${p.phone ? `<span class="muted small" style="direction:ltr;unicode-bidi:isolate;user-select:all">${esc(p.phone)}</span>` : ""}`; }
+function admRequests(list){
+  if (!list.length) return `<div class="list"><div class="empty">لا توجد طلبات جديدة.</div></div>`;
+  return `<div class="list">${list.map(s => `<div class="req">
+    <div class="top">${who(s)}</div>
+    <div class="meta" style="display:flex;gap:6px 12px;flex-wrap:wrap;font-size:14px">
+      <span><b>${planName(s)}</b></span><span class="num">${s.amount ? money(s.amount) : ""}</span>
+      <span>${esc(s.payment_method || "")}: <code style="user-select:all;direction:ltr;unicode-bidi:isolate">${esc(s.payment_ref || "—")}</code></span>
+      <span class="muted">${fmtDate(s.created_at)}</span></div>
+    <div class="acts">
+      <div class="field"><label for="exp-${s.id}" class="small">صالح إلى</label><input id="exp-${s.id}" type="date" value="${defaultExpiry()}"></div>
+      <button class="btn ok sm" data-act="approve" data-id="${s.id}">تفعيل</button>
+      <button class="btn danger sm" data-act="reject" data-id="${s.id}">رفض</button>
+    </div></div>`).join("")}</div>`;
+}
+function admSubs(list){
+  if (!list.length) return `<div class="list"><div class="empty">لا يوجد مشتركون بعد.</div></div>`;
+  return `<div class="list">${list.map(s => `<div class="req">
+    <div class="top">${who(s)}${subStatus(s)}</div>
+    <div class="meta" style="display:flex;gap:6px 12px;flex-wrap:wrap;font-size:14px"><b>${planName(s)}</b>
+      ${s.expires_at ? `<span class="muted">إلى ${fmtDate(s.expires_at)}</span>` : ""}<span class="muted">${esc(s.payment_method || "")} ${esc(s.payment_ref || "")}</span></div>
+    <div class="acts">${s.status === "active" ? `<button class="btn danger sm" data-act="deactivate" data-id="${s.id}" data-confirm="تأكيد الإيقاف؟">إيقاف الاشتراك</button>`
+      : `<button class="btn ok sm" data-act="reactivate" data-id="${s.id}">تفعيل إلى ${fmtDate(defaultExpiry())}</button>`}</div>
+  </div>`).join("")}</div>`;
+}
+async function admFiles(){
+  const a = S.adm;
+  const subs = subjectsOf(a.grade);
+  if (!subs.find(s => s.id === a.subject)) a.subject = subs[0] ? subs[0].id : null;
+  let existing = "";
+  if (a.subject){
+    if (!S.res[a.subject]) S.res[a.subject] = await api.resources(a.subject);
+    const list = S.res[a.subject];
+    existing = list.length ? list.map(r => `<div class="row"><span class="ico">${icon(KICON[r.kind])}</span>
+      <div class="main"><div class="ttl">${esc(r.title)}</div><div class="meta"><span>${KIND[r.kind].one}</span><span>·</span><span style="direction:ltr;unicode-bidi:isolate">${esc(r.file_name || "")}</span>${r.is_free ? `<span class="pill free">مجاني</span>` : ""}</div></div>
+      <button class="btn danger sm" data-act="delres" data-id="${r.id}" data-confirm="تأكيد الحذف؟">حذف</button></div>`).join("")
+      : `<div class="empty">لا توجد ملفّات في هذه المادة بعد.</div>`;
+  }
+  return `<div class="card">
+    <h2 style="font-size:19px">إضافة ملف</h2>
+    <form class="f" data-form="upload" novalidate>
+      <div class="err" role="alert"></div>
+      <div class="two">
+        <div class="field"><label for="up-grade">القسم</label><select id="up-grade" name="grade" data-change="upgrade">${[1,2,3,4,5,6].map(g => `<option value="${g}" ${g === a.grade ? "selected" : ""}>${GRADE[g]}</option>`).join("")}</select></div>
+        <div class="field"><label for="up-subject">المادة</label><select id="up-subject" name="subject" data-change="upsubject">${subs.map(s => `<option value="${s.id}" ${s.id === a.subject ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></div>
+      </div>
+      <div class="field"><label for="up-kind">النوع</label><select id="up-kind" name="kind">${KINDS.map(k => `<option value="${k.id}">${k.label}</option>`).join("")}</select></div>
+      <div class="field"><label for="up-title">العنوان</label><input id="up-title" name="title" required placeholder="مثال: قراءة – الوحدة 2"></div>
+      <div class="field"><label for="up-file">الملف</label><input id="up-file" name="file" type="file" accept=".doc,.docx,.ppt,.pptx,.pdf,.xls,.xlsx,.zip" required><span class="hint">Word أو PowerPoint أو PDF، إلى حدود 50 ميغا.</span></div>
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="is_free" id="up-free"> ملف مجاني (يحمّله كلّ من لديه حساب، كعيّنة)</label>
+      <button class="btn primary" type="submit">${icon("down")}رفع الملف</button>
+    </form>
+  </div>
+  <div><div class="sec-head"><h2 style="font-size:19px">ملفّات ${esc((subs.find(s => s.id === a.subject) || {}).name || "")} · ${GRADE[a.grade]}</h2></div>
+  <div class="list">${existing || `<div class="empty">أضف مادة أولًا.</div>`}</div></div>`;
+}
+function admSubjects(){
+  const g = S.adm.subjGrade;
+  const subs = subjectsOf(g);
+  return `<div class="card">
+    <div class="field"><label for="sj-grade">القسم</label><select id="sj-grade" data-change="sjgrade">${[1,2,3,4,5,6].map(x => `<option value="${x}" ${x === g ? "selected" : ""}>${GRADE[x]}</option>`).join("")}</select></div>
+    <div class="list">${subs.map(s => `<div class="row"><div class="main"><div class="ttl">${esc(s.name)}</div><div class="meta num">${totalOf(s.id)} ملف</div></div>
+      <button class="btn danger sm" data-act="delsubj" data-id="${s.id}" data-confirm="${totalOf(s.id) ? "سيُحذف معها كل ملفّاتها. تأكيد؟" : "تأكيد الحذف؟"}">حذف</button></div>`).join("") || `<div class="empty">لا توجد موادّ.</div>`}</div>
+    <form class="f" data-form="addsubj" novalidate style="grid-template-columns:1fr auto;align-items:end">
+      <div class="field"><label for="sj-name">مادة جديدة في ${GRADE[g]}</label><input id="sj-name" name="name" required placeholder="مثال: الإنجليزية"></div>
+      <button class="btn primary" type="submit">إضافة</button>
+    </form>
+  </div>`;
+}
+
+const VIEWS = { home: vHome, grade: vGrade, subject: vSubject, login: vLogin, register: vRegister, forgot: vForgot, account: vAccount, subscribe: vSubscribe, admin: vAdmin };
+const NEEDS_LOGIN = ["account", "subscribe", "admin"];
+
+let seqR = 0;
+async function render(scrollTop){
+  const n = ++seqR;
+  $("#hdr").innerHTML = header();
+  $("#ftr").innerHTML = footer();
+  $("#demo").innerHTML = api.demo ? `<div class="demo"><div class="wrap"><b>نسخة تجريبية:</b> المحتوى أمثلة فقط، ولا يُحفظ شيء. جرّب الدخول كمعلّم أو كمدير.</div></div>` : "";
+  let route = S.route;
+  if (S.recovery) route = "recovery";
+  else if (NEEDS_LOGIN.includes(route) && !S.session){ S.afterLogin = route; route = "login"; }
+  const view = route === "recovery" ? vRecovery : (VIEWS[route] || vHome);
+  const main = $("#main");
+  let out;
+  try { out = view(S.param); } catch (e) { out = errBox(e); }
+  if (out && typeof out.then === "function"){
+    main.innerHTML = `<div class="loading">جارٍ التحميل…</div>`;
+    try { out = await out; } catch (e) { out = errBox(e); }
+    if (n !== seqR) return;
+  }
+  main.innerHTML = out;
+  if (route === "home" && (S.param === "grades" || S.param === "pricing")){
+    const el = document.getElementById("sec-" + S.param); if (el) el.scrollIntoView({ block: "start" });
+  } else if (scrollTop) window.scrollTo(0, 0);
+}
+const errBox = e => `<div class="wrap"><div class="notice warn" style="margin-top:24px">${esc(arError(e))}</div></div>`;
+
+/* ============================================================
+   الأحداث
+   ============================================================ */
+let toastT;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 3800); }
+async function busy(btn, fn){ const old = btn.innerHTML; btn.disabled = true; try { return await fn(); } finally { if (btn.isConnected){ btn.disabled = false; btn.innerHTML = old; } } }
+function formErr(f, msg){ const e = f.querySelector(".err"); if (e){ e.textContent = msg || ""; e.classList.toggle("on", !!msg); } }
+const resById = (sid, id) => (S.res[sid] || []).find(r => r.id === id);
+function afterLoginGo(){ const t = S.afterLogin || (S.profile && S.profile.is_admin ? "admin" : "account"); S.afterLogin = null; go(t); }
+
+const ACTS = {
+  kind(b){ S.kindTab = b.dataset.k; render(); },
+  plan(b){ S.prePlan = b.dataset.plan; },
+  pregrade(b){ S.preGrade = +b.dataset.g; S.prePlan = "grade"; },
+  remember(){ S.afterLogin = location.hash.slice(1); },
+  locked(b){
+    if (!S.session){ S.afterLogin = location.hash.slice(1); go("login"); }
+    else { S.preGrade = +b.dataset.g; S.prePlan = "grade"; go("subscribe"); }
+  },
+  async download(b){
+    const r = resById(+b.dataset.s, +b.dataset.id); if (!r) return;
+    await busy(b, async () => {
+      try {
+        const url = await api.downloadUrl(r);
+        if (!url){ toast("نسخة تجريبية: في الموقع الحقيقي يبدأ تحميل الملف هنا."); return; }
+        const a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener";
+        document.body.appendChild(a); a.click(); a.remove();
+      } catch (e) { toast(arError(e)); }
+    });
+  },
+  async demoas(b){ await busy(b, async () => { S.session = await api.demoAs(b.dataset.who); await loadUser(); afterLoginGo(); }); },
+  async logout(){ await api.signOut(); S.session = null; S.profile = null; S.subs = []; S.admSubs = null; go("home"); toast("تمّ تسجيل الخروج."); },
+  copy(b){
+    const v = b.dataset.v;
+    const fallback = () => { const el = $("#payval"); if (el){ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } toast("اضغط مطوّلًا على الرقم لنسخه."); };
+    try { navigator.clipboard.writeText(v).then(() => toast("تمّ النسخ."), fallback); } catch (e) { fallback(); }
+  },
+  atab(b){ S.adm.tab = b.dataset.t; render(); },
+  async approve(b){
+    const id = +b.dataset.id; const exp = (document.getElementById("exp-" + id) || {}).value || defaultExpiry();
+    await busy(b, async () => { try { await api.setSub(id, { status: "active", expires_at: exp }); S.admSubs = null; toast("تمّ تفعيل الاشتراك."); render(); } catch (e) { toast(arError(e)); } });
+  },
+  async reject(b){ await busy(b, async () => { try { await api.setSub(+b.dataset.id, { status: "rejected" }); S.admSubs = null; toast("تمّ رفض الطلب."); render(); } catch (e) { toast(arError(e)); } }); },
+  async deactivate(b){ await busy(b, async () => { try { await api.setSub(+b.dataset.id, { status: "rejected" }); S.admSubs = null; toast("تمّ إيقاف الاشتراك."); render(); } catch (e) { toast(arError(e)); } }); },
+  async reactivate(b){ await busy(b, async () => { try { await api.setSub(+b.dataset.id, { status: "active", expires_at: defaultExpiry() }); S.admSubs = null; toast("تمّ التفعيل."); render(); } catch (e) { toast(arError(e)); } }); },
+  async delres(b){
+    const r = resById(S.adm.subject, +b.dataset.id); if (!r) return;
+    await busy(b, async () => { try { await api.deleteResource(r); delete S.res[S.adm.subject]; await loadCatalog(); toast("تمّ حذف الملف."); render(); } catch (e) { toast(arError(e)); } });
+  },
+  async delsubj(b){ await busy(b, async () => { try { await api.deleteSubject(+b.dataset.id); await loadCatalog(); toast("تمّ حذف المادة."); render(); } catch (e) { toast(arError(e)); } }); }
+};
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  if (b.dataset.confirm && b.dataset.armed !== "1"){
+    e.preventDefault(); b.dataset.armed = "1"; const old = b.textContent; b.textContent = b.dataset.confirm;
+    setTimeout(() => { if (b.isConnected && b.dataset.armed === "1"){ b.dataset.armed = ""; b.textContent = old; } }, 4000);
+    return;
+  }
+  const fn = ACTS[b.dataset.act]; if (fn) fn(b, e);
+});
+
+document.addEventListener("change", e => {
+  const t = e.target, k = t.dataset && t.dataset.change; if (!k) return;
+  if (k === "plan"){ S.prePlan = t.value; const gf = $("#grade-field"); if (gf) gf.hidden = t.value === "all"; }
+  if (k === "method"){ $("#payto").innerHTML = payto(t.value); }
+  if (k === "upgrade"){ S.adm.grade = +t.value; S.adm.subject = null; render(); }
+  if (k === "upsubject"){ S.adm.subject = +t.value; render(); }
+  if (k === "sjgrade"){ S.adm.subjGrade = +t.value; render(); }
+});
+
+const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+const FORMS = {
+  async login(f, d, btn){
+    if (!emailOk(d.email)) return formErr(f, "اكتب بريدًا إلكترونيًا صحيحًا.");
+    if (!d.password) return formErr(f, "اكتب كلمة السرّ.");
+    S.session = await api.signIn(d.email.trim(), d.password); await loadUser(); afterLoginGo();
+  },
+  async register(f, d){
+    if (!d.full_name.trim()) return formErr(f, "اكتب اسمك ولقبك.");
+    if (!emailOk(d.email)) return formErr(f, "اكتب بريدًا إلكترونيًا صحيحًا.");
+    if (d.password.length < 6) return formErr(f, "كلمة السرّ يجب أن تكون 6 أحرف على الأقل.");
+    if (d.password !== d.password2) return formErr(f, "كلمتا السرّ غير متطابقتين.");
+    const r = await api.signUp({ email: d.email.trim(), password: d.password, full_name: d.full_name.trim(), phone: d.phone.trim() });
+    if (r && r.session){ S.session = r.session; await loadUser(); toast("مرحبًا بك! تمّ إنشاء حسابك."); afterLoginGo(); }
+    else f.closest(".card").innerHTML = `<h1>تحقّق من بريدك</h1><p>أرسلنا رسالة إلى <b style="direction:ltr;unicode-bidi:isolate">${esc(d.email)}</b>. اضغط على الرابط داخلها لتفعيل حسابك، ثم سجّل الدخول.</p><a class="btn primary" href="#login">تسجيل الدخول</a>`;
+  },
+  async forgot(f, d){
+    if (!emailOk(d.email)) return formErr(f, "اكتب بريدًا إلكترونيًا صحيحًا.");
+    await api.resetPassword(d.email.trim());
+    f.closest(".card").innerHTML = `<h1>تحقّق من بريدك</h1><p>إذا كان البريد مسجّلًا، ستصلك رسالة فيها رابط لتعيين كلمة سرّ جديدة.</p><a class="btn ghost" href="#login">رجوع</a>`;
+  },
+  async newpw(f, d){
+    if (d.password.length < 6) return formErr(f, "كلمة السرّ يجب أن تكون 6 أحرف على الأقل.");
+    await api.updatePassword(d.password); S.recovery = false; toast("تمّ حفظ كلمة السرّ الجديدة."); go("account");
+  },
+  async subscribe(f, d){
+    if (!d.ref.trim()) return formErr(f, "اكتب رقم العملية حتى نتثبّت من الدفع.");
+    const all = d.plan === "all";
+    await api.requestSub({ plan: all ? "all" : "grade", grade: all ? null : +d.grade, payment_method: d.method, payment_ref: d.ref.trim(), amount: all ? C.PRICES.all : C.PRICES.grade });
+    S.subs = await api.mySubs(S.session.user.id); S.admSubs = null;
+    toast("وصلنا طلبك. سنفعّل اشتراكك " + C.ACTIVATION_DELAY + "."); go("account");
+  },
+  async upload(f, d){
+    const file = f.querySelector("#up-file").files[0];
+    if (!d.title.trim()) return formErr(f, "اكتب عنوان الملف.");
+    if (!file) return formErr(f, "اختر الملف الذي تريد رفعه.");
+    if (file.size > 50 * 1024 * 1024) return formErr(f, "الملف أكبر من 50 ميغا. صغّره أو قسّمه.");
+    const sid = +d.subject;
+    await api.upload({ grade: +d.grade, subject_id: sid, kind: d.kind, title: d.title.trim(), file, is_free: !!f.querySelector("#up-free").checked });
+    delete S.res[sid]; await loadCatalog(); toast("تمّ رفع الملف."); render();
+  },
+  async addsubj(f, d){
+    if (!d.name.trim()) return formErr(f, "اكتب اسم المادة.");
+    const g = S.adm.subjGrade; const max = Math.max(0, ...subjectsOf(g).map(s => s.sort || 0));
+    await api.addSubject({ grade: g, name: d.name.trim(), sort: max + 1 }); await loadCatalog(); toast("تمّت إضافة المادة."); render();
+  }
+};
+document.addEventListener("submit", async e => {
+  const f = e.target; const k = f.dataset && f.dataset.form; if (!k) return;
+  e.preventDefault(); formErr(f, "");
+  const d = Object.fromEntries(new FormData(f).entries());
+  ["email","password","password2","full_name","phone","ref","title","name"].forEach(x => { if (d[x] == null) d[x] = ""; });
+  const btn = f.querySelector('[type="submit"]');
+  await busy(btn, async () => { try { await FORMS[k](f, d, btn); } catch (err) { formErr(f, arError(err)); } });
+});
+
+/* ============================================================
+   البداية
+   ============================================================ */
+(async function start(){
+  Object.assign(S, parseHash());
+  $("#main").innerHTML = `<div class="loading">جارٍ التحميل…</div>`;
+  $("#hdr").innerHTML = header();
+  try {
+    S.session = await api.session();
+    await Promise.all([loadCatalog(), loadUser()]);
+  } catch (e) { $("#main").innerHTML = errBox(e); return; }
+  api.onAuth(async (ev, session) => {
+    if (ev === "PASSWORD_RECOVERY") S.recovery = true;
+    const changed = (session && session.user.id) !== (S.session && S.session.user.id);
+    S.session = session;
+    if (changed || ev === "PASSWORD_RECOVERY"){ S.admSubs = null; await loadUser().catch(() => {}); render(); }
+  });
+  render();
+})();
+})();
+</script>
+</body>
+</html>
