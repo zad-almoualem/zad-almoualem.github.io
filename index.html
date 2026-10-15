@@ -238,7 +238,7 @@ window.CONFIG = {
   CURRENCY: "د.ت",
   D17_NUMBER: "25 219 587",                 // رقم D17 متاعك
   TRANSFER_INFO: "RIB: 00 000 0000000000000 00",  // الحساب البنكي أو البريدي
-  CONTACT_PHONE: "+216 00 000 000",         // للتواصل (واتساب)
+  CONTACT_PHONE: "+216 25 219 587 (واتساب)",  // للتواصل
   ACTIVATION_DELAY: "خلال 24 ساعة"
 };
 </script>
@@ -500,7 +500,7 @@ function vHome(){
       <div class="sec-head"><h2>كيف تشترك؟</h2></div>
       <div class="steps">
         <div class="step"><span class="n">1</span><div><b>أنشئ حسابك</b><span class="muted small">بالبريد الإلكتروني وكلمة سرّ.</span></div></div>
-        <div class="step"><span class="n">2</span><div><b>ادفع وأرسل رقم العملية</b><span class="muted small">عبر D17 أو حوالة، ثم اكتب رقم العملية في صفحة الاشتراك.</span></div></div>
+        <div class="step"><span class="n">2</span><div><b>ادفع وأرسل رقم العملية</b><span class="muted small">عبر D17، ثم اكتب رقم العملية في صفحة الاشتراك.</span></div></div>
         <div class="step"><span class="n">3</span><div><b>نفعّل اشتراكك</b><span class="muted small">${esc(C.ACTIVATION_DELAY)}، وتحمّل كلّ ملفّات القسم.</span></div></div>
       </div>
     </section>
@@ -683,10 +683,8 @@ function vSubscribe(){
         </div>
         <div class="field" id="grade-field" ${plan === "all" ? "hidden" : ""}><label for="sb-grade">القسم</label>
           <select id="sb-grade" name="grade">${[1,2,3,4,5,6].map(g => `<option value="${g}" ${g === pre ? "selected" : ""}>${GRADE[g]}</option>`).join("")}</select></div>
-        <div class="field"><span style="font-weight:600">طريقة الدفع</span>
-          <label class="choice"><input type="radio" name="method" value="D17" checked data-change="method"><span><b>D17</b><span class="small muted">أرسل المبلغ إلى الرقم أسفله</span></span></label>
-          <label class="choice"><input type="radio" name="method" value="حوالة" data-change="method"><span><b>حوالة بنكية أو بريدية</b></span></label>
-        </div>
+        <div class="field"><span style="font-weight:600">الدفع عبر D17</span><span class="hint">أرسل المبلغ إلى الرقم التالي، ثم اكتب رقم العملية.</span></div>
+        <input type="hidden" name="method" value="D17">
         <div class="payto" id="payto">${payto("D17")}</div>
         <div class="field"><label for="sb-ref">رقم العملية</label><input id="sb-ref" name="ref" class="ltr" required placeholder="مثال: 48213977"><span class="hint">تجده في رسالة التأكيد بعد الدفع. نستعمله للتثبّت من دفعتك.</span></div>
         <button class="btn primary block" type="submit">أرسل طلب الاشتراك</button>
