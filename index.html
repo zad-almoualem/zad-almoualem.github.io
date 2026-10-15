@@ -703,11 +703,12 @@ async function vAdmin(){
   if (!S.admSubs) S.admSubs = await api.allSubs();
   const a = S.adm;
   const pendingN = S.admSubs.filter(s => s.status === "pending").length;
-  const tabs = [["requests", "الطلبات", pendingN], ["subs", "المشتركون"], ["files", "الملفّات"], ["subjects", "الموادّ"]]
+  const tabs = [["requests", "الطلبات", pendingN], ["subs", "المشتركون"], ["users", "الحسابات"], ["files", "الملفّات"], ["subjects", "الموادّ"]]
     .map(([id, l, c]) => `<button class="atab" data-act="atab" data-t="${id}" aria-pressed="${a.tab === id}">${l}${c ? `<span class="c num">${c}</span>` : ""}</button>`).join("");
   let body = "";
   if (a.tab === "requests") body = admRequests(S.admSubs.filter(s => s.status === "pending"));
   else if (a.tab === "subs") body = admSubs(S.admSubs.filter(s => s.status !== "pending"));
+  else if (a.tab === "users") body = await admUsers();
   else if (a.tab === "files") body = await admFiles();
   else body = admSubjects();
   return `<div class="wrap page">
@@ -731,6 +732,25 @@ function admRequests(list){
       <button class="btn ok sm" data-act="approve" data-id="${s.id}">تفعيل</button>
       <button class="btn danger sm" data-act="reject" data-id="${s.id}">رفض</button>
     </div></div>`).join("")}</div>`;
+}
+async function admUsers(){
+  const users = await api.profiles();
+  const subsOf = id => (S.admSubs || []).filter(s => s.user_id === id);
+  const state = u => {
+    if (u.is_admin) return `<span class="pill free">مدير</span>`;
+    const ss = subsOf(u.id);
+    if (ss.some(s => s.status === "active" && (!s.expires_at || s.expires_at >= today()))) return `<span class="pill active">مشترك</span>`;
+    if (ss.some(s => s.status === "pending")) return `<span class="pill pending">طلب في الانتظار</span>`;
+    return `<span class="pill expired">بلا اشتراك</span>`;
+  };
+  const rows = users.map(u => `<div class="req">
+    <div class="top"><b>${esc(u.full_name || "—")}</b>${state(u)}</div>
+    <div class="meta" style="display:flex;gap:4px 14px;flex-wrap:wrap;font-size:14px">
+      <span class="muted" style="direction:ltr;unicode-bidi:isolate;user-select:all">${esc(u.email || "")}</span>
+      ${u.phone ? `<span class="muted" style="direction:ltr;unicode-bidi:isolate;user-select:all">${esc(u.phone)}</span>` : ""}
+      <span class="muted">سجّل في ${fmtDate(u.created_at)}</span></div>
+  </div>`).join("");
+  return `<p class="muted small num">عدد الحسابات: ${users.length}</p><div class="list">${rows || `<div class="empty">لا توجد حسابات بعد.</div>`}</div>`;
 }
 function admSubs(list){
   if (!list.length) return `<div class="list"><div class="empty">لا يوجد مشتركون بعد.</div></div>`;
