@@ -213,6 +213,37 @@ footer.foot .sel{user-select:all;direction:ltr;unicode-bidi:isolate}
 .toast div{background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;box-shadow:var(--shadow);font-size:14.5px;max-width:520px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
 .toast div.on{opacity:1;transform:none}
 .loading{padding:48px 0;text-align:center;color:var(--muted)}
+/* v2: domains + trimesters */
+.subjline{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.owned{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tab .lk{display:inline-flex;vertical-align:-3px;margin-inline-start:4px}
+.tab .lk svg{width:14px;height:14px}
+.kinds-f{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.kf{appearance:none;border:0;background:var(--sunk);color:var(--muted);border-radius:8px;padding:4px 10px;font:500 13px/1.5 var(--f-body);cursor:pointer}
+.kf[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.group-h{padding:9px 16px;background:var(--sunk);font-weight:600;font-size:13.5px;color:var(--muted);border-top:1px solid var(--line)}
+.group-h:first-child{border-top:0}
+.checks{display:grid;gap:8px}
+.checks.cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:520px){ .checks.cols{grid-template-columns:1fr} }
+.total{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:14px 16px;border-radius:11px;background:var(--accent-soft)}
+.total b{font-family:var(--f-display);font-size:26px;line-height:1.2}
+.total span{font-size:13.5px;color:var(--muted)}
+.price-hero{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.price-hero .price{font-family:var(--f-display);font-size:40px;font-weight:700;line-height:1.1}
+.ex{display:grid;gap:0;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.ex div{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid var(--line)}
+.ex div:first-child{border-top:0}
+.ex b{white-space:nowrap}
+.dom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.dom-chip{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:12px 14px;min-width:0}
+.dom-chip b{display:block;font-family:var(--f-display);font-size:16px}
+.dom-card{display:grid;gap:10px;padding:16px}
+.dom-card .hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dom-card h3{font-size:18px}
+form.f.inline-f{display:flex;gap:8px;align-items:flex-end}
+.inline-f .field{flex:1;min-width:0}
+.tabs.wrapt{flex-wrap:wrap;overflow:visible}
 </style>
 </head>
 <body>
@@ -223,22 +254,18 @@ footer.foot .sel{user-select:all;direction:ltr;unicode-bidi:isolate}
   <footer class="foot"><div class="wrap" id="ftr"></div></footer>
   <div class="toast" aria-live="polite"><div id="toast"></div></div>
 </div>
-
 <script>
 /* ============================================================
-   الإعدادات — بدّل هذي القيم متاعك
+   الإعدادات
    ============================================================ */
 window.CONFIG = {
-  // من Supabase: Project Settings ← API   (خلّيهم فارغين = نسخة تجريبية)
   SUPABASE_URL: "https://dtswalzriubjmroimbfh.supabase.co",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3dhbHpyaXViam1yb2ltYmZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNTc5OTQsImV4cCI6MjEwNzYzMzk5NH0.JC7vkczDO2JoyitBzpE2jwJASMxqM74g7b_cJ9C57-4",
-
   SITE_NAME: "زاد المعلّم",
-  PRICES: { grade: 30, all: 120 },          // بالدينار، للسنة الدراسية
+  PRICE: 40,          // د.ت لكلّ مجال في الثلاثي (نفس الرقم في Supabase: public.unit_price)
   CURRENCY: "د.ت",
-  D17_NUMBER: "25 219 587",                 // رقم D17 متاعك
-  TRANSFER_INFO: "RIB: 00 000 0000000000000 00",  // الحساب البنكي أو البريدي
-  CONTACT_PHONE: "+216 25 219 587 (واتساب)",  // للتواصل
+  D17_NUMBER: "25 219 587",
+  CONTACT_PHONE: "+216 25 219 587 (واتساب)",
   ACTIVATION_DELAY: "خلال 24 ساعة"
 };
 </script>
@@ -250,6 +277,8 @@ const C = window.CONFIG;
 const $ = s => document.querySelector(s);
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const GRADE = ["", "السنة الأولى", "السنة الثانية", "السنة الثالثة", "السنة الرابعة", "السنة الخامسة", "السنة السادسة"];
+const TRIM = ["طوال السنة", "الثلاثي الأول", "الثلاثي الثاني", "الثلاثي الثالث"];
+const TRIM_MONTHS = ["", "سبتمبر – ديسمبر", "جانفي – مارس", "أفريل – جوان"];
 const KINDS = [
   { id: "mudhakkira",   label: "مذكّرات",          one: "مذكّرة" },
   { id: "presentation", label: "عروض PowerPoint",   one: "عرض" },
@@ -275,7 +304,14 @@ const money = n => `${Number(n).toLocaleString("fr-TN")} ${C.CURRENCY}`;
 const fmtDate = d => d ? new Date(d).toLocaleDateString("ar-TN-u-nu-latn", { day: "numeric", month: "long", year: "numeric" }) : "";
 const today = () => new Date().toISOString().slice(0, 10);
 function defaultExpiry(){ const d = new Date(); const y = d.getMonth() >= 6 ? d.getFullYear() + 1 : d.getFullYear(); return `${y}-06-30`; }
-const planName = s => s.plan === "all" ? "كل الأقسام" : `اشتراك ${GRADE[s.grade]}`;
+function currentTrim(){ const m = new Date().getMonth(); return m >= 8 ? 1 : m <= 2 ? 2 : 3; }
+function nDomains(n){ return n === 1 ? "مجال واحد" : n === 2 ? "مجالان" : n <= 10 ? `${n} مجالات` : `${n} مجالًا`; }
+function nFiles(n){ return n === 0 ? "لا ملفّات بعد" : n === 1 ? "ملف واحد" : n === 2 ? "ملفّان" : n <= 10 ? `${n} ملفّات` : `${n} ملفًّا`; }
+function trimsLabel(ts){
+  const t = (ts || []).slice().sort();
+  if (t.length === 3) return "السنة كاملة (3 ثلاثيات)";
+  return t.map(x => TRIM[x]).join(" + ");
+}
 
 function arError(e){
   const m = String(e && (e.message || e.error_description || e) || "");
@@ -284,7 +320,10 @@ function arError(e){
   if (/Email not confirmed/i.test(m)) return "لم يتمّ تأكيد البريد بعد. افتح الرسالة التي وصلتك واضغط على رابط التأكيد.";
   if (/at least 6/i.test(m)) return "كلمة السرّ يجب أن تكون 6 أحرف على الأقل.";
   if (/rate limit|too many/i.test(m)) return "محاولات كثيرة. انتظر دقيقة ثم أعد المحاولة.";
+  if (/domain does not belong/i.test(m)) return "أحد المجالات المختارة لا يخصّ هذا القسم. أعد اختيار المجالات.";
+  if (/duplicate key|unique/i.test(m)) return "هذا الاسم موجود من قبل.";
   if (/not found|row-level|permission|policy/i.test(m)) return "ليس لديك صلاحية لهذه العملية. تحقّق من اشتراكك أو أعد تسجيل الدخول.";
+  if (/does not exist|relation|schema cache/i.test(m)) return "قاعدة البيانات تحتاج إلى التحديث. شغّل ملف التحديث في Supabase.";
   if (/Failed to fetch|NetworkError/i.test(m)) return "تعذّر الاتصال بالخادم. تحقّق من الإنترنت ثم أعد المحاولة.";
   return "حدث خطأ: " + m;
 }
@@ -308,22 +347,28 @@ function supabaseApi(){
     async resetPassword(email){ ok(await sb.auth.resetPasswordForEmail(email, { redirectTo: here })); },
     async updatePassword(password){ ok(await sb.auth.updateUser({ password })); },
     async profile(id){ return ok(await sb.from("profiles").select("*").eq("id", id).maybeSingle()); },
-    async subjects(){ return ok(await sb.from("subjects").select("*").order("grade").order("sort").order("id")); },
-    async counts(){ return ok(await sb.from("resource_counts").select("*")); },
-    async resources(subjectId){ return ok(await sb.from("resources").select("*").eq("subject_id", subjectId).order("created_at", { ascending: false })); },
+    async domains(){ return ok(await sb.from("domains").select("*").order("grade").order("sort").order("id")); },
+    async subjects(){ return ok(await sb.from("subjects").select("*").order("sort").order("id")); },
+    async counts(){ return ok(await sb.from("domain_counts").select("*")); },
+    async resources(subjectIds){
+      if (!subjectIds.length) return [];
+      return ok(await sb.from("resources").select("*").in("subject_id", subjectIds).order("created_at", { ascending: false }));
+    },
     async downloadUrl(r){ return ok(await sb.storage.from("resources").createSignedUrl(r.file_path, 300, { download: r.file_name || true })).signedUrl; },
     async mySubs(uid){ return ok(await sb.from("subscriptions").select("*").eq("user_id", uid).order("created_at", { ascending: false })); },
     async requestSub(row){ ok(await sb.from("subscriptions").insert(row)); },
     async allSubs(){ return ok(await sb.from("subscriptions").select("*, profiles(full_name,email,phone)").order("created_at", { ascending: false })); },
     async setSub(id, patch){ ok(await sb.from("subscriptions").update(patch).eq("id", id)); },
-    async upload({ grade, subject_id, kind, title, file, is_free }){
+    async upload({ grade, subject_id, kind, trimester, title, file, is_free }){
       const ext = ((file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "")) || "bin";
       const path = `${grade}/${subject_id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       ok(await sb.storage.from("resources").upload(path, file, { contentType: file.type || undefined }));
-      const r = await sb.from("resources").insert({ subject_id, kind, title, file_path: path, file_name: file.name, is_free });
+      const r = await sb.from("resources").insert({ subject_id, kind, trimester, title, file_path: path, file_name: file.name, is_free });
       if (r.error){ await sb.storage.from("resources").remove([path]); throw r.error; }
     },
     async deleteResource(r){ ok(await sb.from("resources").delete().eq("id", r.id)); await sb.storage.from("resources").remove([r.file_path]); },
+    async addDomain(row){ ok(await sb.from("domains").insert(row)); },
+    async deleteDomain(id){ ok(await sb.from("domains").delete().eq("id", id)); },
     async addSubject(row){ ok(await sb.from("subjects").insert(row)); },
     async deleteSubject(id){ ok(await sb.from("subjects").delete().eq("id", id)); },
     async profiles(){ return ok(await sb.from("profiles").select("*").order("created_at", { ascending: false })); }
@@ -331,7 +376,7 @@ function supabaseApi(){
 }
 
 function demoApi(){
-  const wait = (v) => new Promise(r => setTimeout(() => r(v), 160));
+  const wait = v => new Promise(r => setTimeout(() => r(v), 140));
   const now = Date.now(), ago = d => new Date(now - d * 864e5).toISOString();
   let seq = 1000, listener = null, session = null;
   const users = [
@@ -340,33 +385,39 @@ function demoApi(){
     { id: "u-2", email: "teacher.one@demo.tn", full_name: "مشترك تجريبي 1", phone: "+216 22 111 111", is_admin: false, created_at: ago(3) },
     { id: "u-3", email: "teacher.two@demo.tn", full_name: "مشترك تجريبي 2", phone: "+216 55 222 222", is_admin: false, created_at: ago(20) }
   ];
-  const subjects = [];
-  const base = ["العربية", "الرياضيات", "الإيقاظ العلمي", "التربية الإسلامية", "التربية التكنولوجية", "التربية التشكيلية", "التربية الموسيقية", "التربية البدنية"];
-  for (let g = 1; g <= 6; g++){
-    base.forEach((n, i) => subjects.push({ id: seq++, grade: g, name: n, sort: i < 4 ? i + 1 : i + 2 }));
-    if (g >= 2) subjects.push({ id: seq++, grade: g, name: "الفرنسية", sort: 5 });
-    if (g >= 5){ subjects.push({ id: seq++, grade: g, name: "الإنجليزية", sort: 5 }); subjects.push({ id: seq++, grade: g, name: "التنشئة الاجتماعية", sort: 5 }); }
-  }
-  subjects.sort((a, b) => a.grade - b.grade || a.sort - b.sort || a.id - b.id);
-  const resources = [];
-  const T = {
-    "العربية": [["mudhakkira", "تواصل شفوي – الوحدة 1"], ["mudhakkira", "قراءة – الوحدة 1"], ["mudhakkira", "إنتاج كتابي – الوحدة 1"], ["presentation", "عرض نصّ القراءة – الوحدة 1"], ["planning", "التخطيط السنوي للعربية"], ["evaluation", "تقييم نهاية الثلاثي الأول"]],
-    "الرياضيات": [["mudhakkira", "الأعداد – الحصّة 1"], ["mudhakkira", "الجمع والطرح – الحصّة 2"], ["presentation", "عرض: الأشكال الهندسية"], ["planning", "توزيع الثلاثي الأول"], ["evaluation", "تمارين علاجية – الأعداد"], ["evaluation", "فرض المراقبة 1"]],
-    "الإيقاظ العلمي": [["mudhakkira", "الكائنات الحيّة – الحصّة 1"], ["presentation", "عرض: دورة الماء"], ["evaluation", "تقييم الثلاثي الأول"]],
-    "الفرنسية": [["mudhakkira", "Lecture – Module 1"], ["presentation", "Vocabulaire illustré – Module 1"], ["planning", "Planification annuelle"]]
+  const DOM = [["العربية", 1, 1, ["تواصل شفوي", "قراءة", "قواعد لغة", "إنتاج كتابي"]], ["العلوم", 2, 1, ["الرياضيات", "الإيقاظ العلمي"]],
+    ["الفرنسية", 3, 2, ["الفرنسية"]], ["الإنجليزية", 4, 4, ["الإنجليزية"]], ["التنشئة الاجتماعية", 5, 5, ["التاريخ", "الجغرافيا", "التربية المدنية"]]];
+  const domains = [], subjects = [], resources = [];
+  for (let g = 1; g <= 6; g++) DOM.forEach(([name, sort, from, subs]) => {
+    if (g < from) return;
+    const d = { id: seq++, grade: g, name, sort }; domains.push(d);
+    subs.forEach((s, i) => subjects.push({ id: seq++, domain_id: d.id, name: s, sort: i + 1 }));
+  });
+  const SAMPLE = {
+    "تواصل شفوي": [["mudhakkira", "الوحدة 1 – الحصّة 1", 1], ["mudhakkira", "الوحدة 2 – الحصّة 1", 1], ["mudhakkira", "الوحدة 4 – الحصّة 1", 2]],
+    "قراءة": [["mudhakkira", "نصّ الوحدة 1", 1], ["presentation", "عرض نصّ الوحدة 1", 1], ["mudhakkira", "نصّ الوحدة 4", 2]],
+    "قواعد لغة": [["mudhakkira", "درس الوحدة 1", 1]],
+    "إنتاج كتابي": [["mudhakkira", "إنتاج كتابي – الوحدة 1", 1], ["evaluation", "تقييم الإنتاج الكتابي", 1]],
+    "الرياضيات": [["mudhakkira", "الأعداد – الحصّة 1", 1], ["presentation", "عرض: الأشكال الهندسية", 1], ["evaluation", "فرض المراقبة 1", 1], ["mudhakkira", "الكسور – الحصّة 1", 2]],
+    "الإيقاظ العلمي": [["mudhakkira", "الكائنات الحيّة – الحصّة 1", 1], ["presentation", "عرض: دورة الماء", 2]],
+    "التاريخ": [["mudhakkira", "الدرس 1", 1]], "الجغرافيا": [["mudhakkira", "الدرس 1", 1]], "التربية المدنية": [["mudhakkira", "الدرس 1", 1]],
+    "الفرنسية": [["mudhakkira", "Module 1 – Lecture", 1], ["presentation", "Vocabulaire illustré – Module 1", 1]],
+    "الإنجليزية": [["mudhakkira", "Module 1 – Lesson 1", 1]]
   };
-  let ri = 0;
-  subjects.forEach(s => (T[s.name] || []).forEach(([kind, title], j) => {
-    resources.push({ id: seq++, subject_id: s.id, kind, title, file_path: `demo/${s.id}/${j}`, file_name: title + (kind === "presentation" ? ".pptx" : ".docx"), is_free: s.name === "العربية" && j === 0, created_at: ago(30 - (ri++ % 28)) });
-  }));
-  const g3 = subjects.find(s => s.grade === 3).grade;
+  let k = 0;
+  subjects.forEach(s => {
+    (SAMPLE[s.name] || []).forEach(([kind, title, t], j) => resources.push({ id: seq++, subject_id: s.id, kind, trimester: t, title, file_path: "demo/" + seq, file_name: title + (kind === "presentation" ? ".pptx" : ".docx"), is_free: s.name === "قراءة" && j === 0, created_at: ago(30 - (k++ % 28)) }));
+    if (s.sort === 1) resources.push({ id: seq++, subject_id: s.id, kind: "planning", trimester: null, title: "التخطيط السنوي", file_path: "demo/" + seq, file_name: "تخطيط.docx", is_free: false, created_at: ago(40) });
+  });
+  const dom = (g, n) => domains.find(d => d.grade === g && d.name === n).id;
   const subs = [
-    { id: seq++, user_id: "u-2", plan: "grade", grade: g3, status: "pending", payment_method: "D17", payment_ref: "D17-48213977", amount: C.PRICES.grade, expires_at: null, created_at: ago(0.2) },
-    { id: seq++, user_id: "u-3", plan: "all", grade: null, status: "active", payment_method: "حوالة", payment_ref: "VIR-20931", amount: C.PRICES.all, expires_at: defaultExpiry(), created_at: ago(18) }
+    { id: seq++, user_id: "u-2", grade: 3, domain_ids: [dom(3, "العربية"), dom(3, "العلوم")], trimesters: [1], status: "pending", payment_method: "D17", payment_ref: "48213977", amount: 2 * C.PRICE, expires_at: null, created_at: ago(0.2) },
+    { id: seq++, user_id: "u-3", grade: 5, domain_ids: [dom(5, "العربية")], trimesters: [1, 2, 3], status: "active", payment_method: "D17", payment_ref: "20931455", amount: 3 * C.PRICE, expires_at: defaultExpiry(), created_at: ago(18) }
   ];
   const withProfile = s => ({ ...s, profiles: users.find(u => u.id === s.user_id) });
   const emit = ev => listener && setTimeout(() => listener(ev, session), 0);
   const login = u => { session = { user: { id: u.id, email: u.email } }; emit("SIGNED_IN"); return session; };
+  const copy = a => a.map(x => ({ ...x }));
   return {
     demo: true,
     async session(){ return session; },
@@ -376,27 +427,39 @@ function demoApi(){
       if (!u){ u = { id: "u-" + seq++, email, full_name, phone, is_admin: false, created_at: new Date().toISOString() }; users.push(u); }
       return wait({ session: login(u) });
     },
-    async signIn(email){ let u = users.find(x => x.email === email) || users[1]; return wait(login(u)); },
+    async signIn(email){ const u = users.find(x => x.email === email) || users[1]; return wait(login(u)); },
     async demoAs(who){ return wait(login(users.find(u => u.id === who))); },
     async signOut(){ session = null; emit("SIGNED_OUT"); },
     async resetPassword(){ return wait(); },
     async updatePassword(){ return wait(); },
     async profile(id){ return wait({ ...users.find(u => u.id === id) }); },
-    async subjects(){ return wait(subjects.map(s => ({ ...s }))); },
+    async domains(){ return wait(copy(domains).sort((a, b) => a.grade - b.grade || a.sort - b.sort || a.id - b.id)); },
+    async subjects(){ return wait(copy(subjects).sort((a, b) => a.sort - b.sort || a.id - b.id)); },
     async counts(){
-      const m = {}; resources.forEach(r => { const k = r.subject_id + "|" + r.kind; m[k] = (m[k] || 0) + 1; });
-      return wait(Object.entries(m).map(([k, n]) => { const [subject_id, kind] = k.split("|"); return { subject_id: +subject_id, kind, n }; }));
+      const m = {}; resources.forEach(r => { const s = subjects.find(x => x.id === r.subject_id); if (s) m[s.domain_id] = (m[s.domain_id] || 0) + 1; });
+      return wait(Object.entries(m).map(([domain_id, n]) => ({ domain_id: +domain_id, n })));
     },
-    async resources(id){ return wait(resources.filter(r => r.subject_id === id).sort((a, b) => b.created_at.localeCompare(a.created_at)).map(r => ({ ...r }))); },
+    async resources(ids){ return wait(copy(resources.filter(r => ids.includes(r.subject_id))).sort((a, b) => b.created_at.localeCompare(a.created_at))); },
     async downloadUrl(){ return wait(null); },
-    async mySubs(uid){ return wait(subs.filter(s => s.user_id === uid).map(s => ({ ...s })).reverse()); },
-    async requestSub(row){ subs.push({ id: seq++, user_id: session.user.id, status: "pending", expires_at: null, created_at: new Date().toISOString(), grade: null, ...row }); return wait(); },
+    async mySubs(uid){ return wait(copy(subs.filter(s => s.user_id === uid)).reverse()); },
+    async requestSub(row){
+      const domain_ids = [...new Set(row.domain_ids)], trimesters = [...new Set(row.trimesters)].sort();
+      subs.push({ ...row, id: seq++, user_id: session.user.id, status: "pending", expires_at: null, created_at: new Date().toISOString(), domain_ids, trimesters, amount: domain_ids.length * trimesters.length * C.PRICE });
+      return wait();
+    },
     async allSubs(){ return wait(subs.map(withProfile).reverse()); },
     async setSub(id, patch){ Object.assign(subs.find(s => s.id === id), patch); return wait(); },
-    async upload({ subject_id, kind, title, file, is_free }){ resources.push({ id: seq++, subject_id, kind, title, file_path: "demo/new/" + seq, file_name: file.name, is_free, created_at: new Date().toISOString() }); return wait(); },
+    async upload({ subject_id, kind, trimester, title, file, is_free }){ resources.push({ id: seq++, subject_id, kind, trimester, title, file_path: "demo/" + seq, file_name: file.name, is_free, created_at: new Date().toISOString() }); return wait(); },
     async deleteResource(r){ const i = resources.findIndex(x => x.id === r.id); if (i >= 0) resources.splice(i, 1); return wait(); },
-    async addSubject(row){ subjects.push({ id: seq++, ...row }); subjects.sort((a, b) => a.grade - b.grade || a.sort - b.sort || a.id - b.id); return wait(); },
-    async deleteSubject(id){ const i = subjects.findIndex(s => s.id === id); if (i >= 0) subjects.splice(i, 1); for (let j = resources.length - 1; j >= 0; j--) if (resources[j].subject_id === id) resources.splice(j, 1); return wait(); },
+    async addDomain(row){ if (domains.some(d => d.grade === row.grade && d.name === row.name)) throw new Error("duplicate key"); domains.push({ id: seq++, ...row }); return wait(); },
+    async deleteDomain(id){
+      const sIds = subjects.filter(s => s.domain_id === id).map(s => s.id);
+      for (let i = resources.length - 1; i >= 0; i--) if (sIds.includes(resources[i].subject_id)) resources.splice(i, 1);
+      for (let i = subjects.length - 1; i >= 0; i--) if (subjects[i].domain_id === id) subjects.splice(i, 1);
+      domains.splice(domains.findIndex(d => d.id === id), 1); return wait();
+    },
+    async addSubject(row){ if (subjects.some(s => s.domain_id === row.domain_id && s.name === row.name)) throw new Error("duplicate key"); subjects.push({ id: seq++, ...row }); return wait(); },
+    async deleteSubject(id){ for (let i = resources.length - 1; i >= 0; i--) if (resources[i].subject_id === id) resources.splice(i, 1); subjects.splice(subjects.findIndex(s => s.id === id), 1); return wait(); },
     async profiles(){ return wait(users.slice().reverse()); }
   };
 }
@@ -408,15 +471,15 @@ const api = DEMO ? demoApi() : supabaseApi();
    الحالة والتنقّل
    ============================================================ */
 const S = {
-  session: null, profile: null, subs: [], subjects: [], counts: {},
+  session: null, profile: null, subs: [], domains: [], subjects: [], counts: {},
   route: "home", param: null, recovery: false, afterLogin: null,
-  kindTab: "all", res: {}, preGrade: null,
-  adm: { tab: "requests", grade: 1, subject: null, subjGrade: 1 }, admSubs: null
+  trimTab: null, kindTab: "all", res: {}, pre: null, lastGrade: 1,
+  adm: { tab: "requests", grade: 1, domain: null, subject: null, domGrade: 1 }, admSubs: null
 };
 const ROUTES = ["home", "login", "register", "forgot", "account", "subscribe", "admin"];
 function parseHash(){
   const h = decodeURIComponent((location.hash || "").slice(1));
-  const m = h.match(/^(grade|subject)-(\d+)$/);
+  const m = h.match(/^(grade|domain)-(\d+)$/);
   if (m) return { route: m[1], param: +m[2] };
   if (h === "grades" || h === "pricing") return { route: "home", param: h };
   return { route: ROUTES.includes(h) ? h : "home", param: null };
@@ -424,15 +487,36 @@ function parseHash(){
 function go(h){ if (location.hash === "#" + h){ Object.assign(S, parseHash()); render(); } else location.hash = h; }
 window.addEventListener("hashchange", () => {
   const prev = S.route + S.param; Object.assign(S, parseHash());
-  if (S.route === "subject" && prev !== S.route + S.param) S.kindTab = "all";
+  if (S.route === "domain" && prev !== S.route + S.param){ S.trimTab = null; S.kindTab = "all"; }
   render(true);
 });
 
-const activeSubs = () => S.subs.filter(s => s.status === "active" && (!s.expires_at || s.expires_at >= today()));
-const hasAccess = g => !!(S.profile && S.profile.is_admin) || activeSubs().some(s => s.plan === "all" || s.grade === g);
-const subjectsOf = g => S.subjects.filter(s => s.grade === g);
-const countOf = (sid, kind) => (S.counts[sid] || {})[kind] || 0;
-const totalOf = sid => KINDS.reduce((a, k) => a + countOf(sid, k.id), 0);
+const domainsOf = g => S.domains.filter(d => d.grade === g);
+const domainById = id => S.domains.find(d => d.id === id);
+const subjectsOf = did => S.subjects.filter(s => s.domain_id === did);
+const subjectById = id => S.subjects.find(s => s.id === id);
+function subjLine(did){
+  const d = domainById(did), ss = subjectsOf(did);
+  if (ss.length === 1 && d && ss[0].name === d.name) return "";
+  return ss.map(s => s.name).join(" · ");
+}
+const isAdmin = () => !!(S.profile && S.profile.is_admin);
+const isActive = s => s.status === "active" && (!s.expires_at || s.expires_at >= today());
+const activeSubs = () => S.subs.filter(isActive);
+function hasAccess(g, did, t){
+  if (isAdmin()) return true;
+  return activeSubs().some(s => s.grade === g && (s.domain_ids || []).map(Number).includes(did) && (t == null || (s.trimesters || []).map(Number).includes(t)));
+}
+function ownedTrims(g, did){
+  if (isAdmin()) return [1, 2, 3];
+  const set = new Set();
+  activeSubs().forEach(s => { if (s.grade === g && (s.domain_ids || []).map(Number).includes(did)) (s.trimesters || []).forEach(t => set.add(+t)); });
+  return [...set].sort();
+}
+function subDesc(s){
+  const names = (s.domain_ids || []).map(id => (domainById(+id) || { name: "مجال محذوف" }).name).join(" + ");
+  return `${GRADE[s.grade] || ""} · ${names} · ${trimsLabel((s.trimesters || []).map(Number))}`;
+}
 
 async function loadUser(){
   if (!S.session){ S.profile = null; S.subs = []; return; }
@@ -441,24 +525,24 @@ async function loadUser(){
   S.profile = p; S.subs = subs || [];
 }
 async function loadCatalog(){
-  const [subjects, rows] = await Promise.all([api.subjects(), api.counts()]);
-  S.subjects = subjects || []; S.counts = {};
-  (rows || []).forEach(r => { (S.counts[r.subject_id] = S.counts[r.subject_id] || {})[r.kind] = r.n; });
+  const [domains, subjects, rows] = await Promise.all([api.domains(), api.subjects(), api.counts()]);
+  S.domains = domains || []; S.subjects = subjects || []; S.counts = {};
+  (rows || []).forEach(r => { S.counts[r.domain_id] = r.n; });
+  S.res = {};
 }
 
 /* ============================================================
    الواجهات
    ============================================================ */
 function header(){
-  const logged = !!S.session;
   return `
   <a class="brand" href="#home"><span class="mark">${icon("book")}</span><b>${esc(C.SITE_NAME)}</b></a>
   <nav class="nav" aria-label="القائمة">
     <a class="lnk opt" href="#grades">الأقسام</a>
     <a class="lnk opt" href="#pricing">الأسعار</a>
-    ${S.profile && S.profile.is_admin ? `<a class="lnk" href="#admin">لوحة التحكّم</a>` : ""}
-    ${logged ? `<a class="btn soft sm" href="#account">${icon("user")}حسابي</a>`
-             : `<a class="btn primary sm" href="#login">تسجيل الدخول</a>`}
+    ${isAdmin() ? `<a class="lnk" href="#admin">لوحة التحكّم</a>` : ""}
+    ${S.session ? `<a class="btn soft sm" href="#account">${icon("user")}حسابي</a>`
+                : `<a class="btn primary sm" href="#login">تسجيل الدخول</a>`}
   </nav>`;
 }
 function footer(){
@@ -467,23 +551,35 @@ function footer(){
 }
 
 function coverCard(g){
-  const subs = subjectsOf(g);
-  const n = subs.reduce((a, s) => a + totalOf(s.id), 0);
+  const ds = domainsOf(g);
+  const n = ds.reduce((a, d) => a + (S.counts[d.id] || 0), 0);
+  const owned = S.session && ds.some(d => ownedTrims(g, d.id).length);
   return `<a class="cover" style="--gc:var(--g${g})" href="#grade-${g}">
-    ${S.session && hasAccess(g) ? `<span class="own">مفعّل</span>` : ""}
+    ${owned ? `<span class="own">مفعّل</span>` : ""}
     <span class="gnum">${g}</span>
-    <span class="lbl"><b>${GRADE[g]}</b><span class="num">${subs.length} مادة · ${n} ملف</span></span>
+    <span class="lbl"><b>${GRADE[g]}</b><span class="num">${nDomains(ds.length)} · ${nFiles(n)}</span></span>
   </a>`;
+}
+
+function domainCatalog(){
+  const map = new Map();
+  S.domains.forEach(d => {
+    if (!map.has(d.name)) map.set(d.name, { sort: d.sort, subs: new Set() });
+    subjectsOf(d.id).forEach(s => { if (s.name !== d.name) map.get(d.name).subs.add(s.name); });
+  });
+  return [...map.entries()].sort((a, b) => a[1].sort - b[1].sort)
+    .map(([name, v]) => `<div class="dom-chip"><b>${esc(name)}</b><span class="subjline">${esc([...v.subs].join(" · "))}</span></div>`).join("");
 }
 
 function vHome(){
   const kinds = KINDS.map(k => `<span class="kind-tag">${icon(KICON[k.id])}${k.label}</span>`).join("");
+  const p = C.PRICE;
   return `
   <div class="wrap">
     <section class="hero">
       <span class="eyebrow">للمعلّمين في المدرسة الابتدائية</span>
-      <h1>مذكّرات وعروض وتقييمات جاهزة، من السنة الأولى إلى السادسة</h1>
-      <p class="lead">اشترك في قسمك أو في كلّ الأقسام، وحمّل ملفّاتك بصيغة Word وPowerPoint متى احتجتها. كلّ الموادّ مرتّبة حسب القسم والنوع.</p>
+      <h1>مذكّرات وعروض وتقييمات جاهزة، مرتّبة حسب المجال والثلاثي</h1>
+      <p class="lead">من السنة الأولى إلى السادسة. اشترك في المجال الذي تدرّسه للثلاثي الذي تحتاجه، وحمّل ملفّاتك بصيغة Word وPowerPoint متى احتجتها.</p>
       <div class="kinds">${kinds}</div>
       <div class="ctas">
         <a class="btn primary" href="#grades">اختر قسمك</a>
@@ -492,35 +588,41 @@ function vHome(){
     </section>
 
     <section class="block" id="sec-grades">
-      <div class="sec-head"><h2>الأقسام</h2><span class="muted small">اضغط على القسم لترى موادّه وملفّاته</span></div>
+      <div class="sec-head"><h2>الأقسام</h2><span class="muted small">اضغط على القسم لترى مجالاته وملفّاته</span></div>
       <div class="covers">${[1,2,3,4,5,6].map(coverCard).join("")}</div>
+    </section>
+
+    <section class="block">
+      <div class="sec-head"><h2>المجالات</h2></div>
+      <div class="dom-grid">${domainCatalog()}</div>
+    </section>
+
+    <section class="block" id="sec-pricing">
+      <div class="sec-head"><h2>الأسعار</h2></div>
+      <div class="plans">
+        <div class="plan feat">
+          <div class="price-hero"><span class="price num">${money(p)}</span><span class="muted">للمجال الواحد في الثلاثي</span></div>
+          <ul><li>تختار القسم، ثمّ المجالات والثلاثيات التي تحتاجها</li><li>كلّ ملفّات المجال في ذلك الثلاثي: مذكّرات، عروض، تخطيطات وتقييمات</li><li>كلّ ملف جديد يُضاف للمجال في ثلاثيك يصلك بلا مقابل إضافي</li></ul>
+          <a class="btn primary" href="#subscribe">اشترك الآن</a>
+        </div>
+        <div class="plan">
+          <b>أمثلة</b>
+          <div class="ex">
+            <div><span>مجال واحد لثلاثي واحد</span><b class="num">${money(p)}</b></div>
+            <div><span>العربية والعلوم للثلاثي الأول</span><b class="num">${money(2 * p)}</b></div>
+            <div><span>مجال واحد للسنة كاملة</span><b class="num">${money(3 * p)}</b></div>
+          </div>
+          <span class="muted small">الثلاثي الأول: ${TRIM_MONTHS[1]} · الثاني: ${TRIM_MONTHS[2]} · الثالث: ${TRIM_MONTHS[3]}</span>
+        </div>
+      </div>
     </section>
 
     <section class="block">
       <div class="sec-head"><h2>كيف تشترك؟</h2></div>
       <div class="steps">
         <div class="step"><span class="n">1</span><div><b>أنشئ حسابك</b><span class="muted small">بالبريد الإلكتروني وكلمة سرّ.</span></div></div>
-        <div class="step"><span class="n">2</span><div><b>ادفع وأرسل رقم العملية</b><span class="muted small">عبر D17، ثم اكتب رقم العملية في صفحة الاشتراك.</span></div></div>
-        <div class="step"><span class="n">3</span><div><b>نفعّل اشتراكك</b><span class="muted small">${esc(C.ACTIVATION_DELAY)}، وتحمّل كلّ ملفّات القسم.</span></div></div>
-      </div>
-    </section>
-
-    <section class="block" id="sec-pricing">
-      <div class="sec-head"><h2>الأسعار</h2><span class="muted small">صالحة إلى آخر السنة الدراسية (30 جوان)</span></div>
-      <div class="plans">
-        <div class="plan">
-          <b>اشتراك قسم واحد</b>
-          <div class="price num">${money(C.PRICES.grade)} <small>/ السنة الدراسية</small></div>
-          <ul><li>كلّ موادّ القسم الذي تختاره</li><li>المذكّرات والعروض والتخطيطات والتقييمات</li><li>كلّ الملفّات الجديدة طوال السنة</li></ul>
-          <a class="btn ghost" href="#subscribe" data-act="plan" data-plan="grade">اختر هذا الاشتراك</a>
-        </div>
-        <div class="plan feat">
-          <span class="badge">الأوفر</span>
-          <b>كلّ الأقسام</b>
-          <div class="price num">${money(C.PRICES.all)} <small>/ السنة الدراسية</small></div>
-          <ul><li>الأقسام الستّة بكلّ موادّها</li><li>مناسب لمن يدرّس أكثر من قسم</li><li>كلّ الملفّات الجديدة طوال السنة</li></ul>
-          <a class="btn primary" href="#subscribe" data-act="plan" data-plan="all">اختر هذا الاشتراك</a>
-        </div>
+        <div class="step"><span class="n">2</span><div><b>اختر وادفع عبر D17</b><span class="muted small">اختر القسم والمجالات والثلاثيات، ثم اكتب رقم العملية.</span></div></div>
+        <div class="step"><span class="n">3</span><div><b>نفعّل اشتراكك</b><span class="muted small">${esc(C.ACTIVATION_DELAY)}، وتحمّل ملفّاتك.</span></div></div>
       </div>
     </section>
   </div>`;
@@ -528,57 +630,79 @@ function vHome(){
 
 function vGrade(g){
   if (!(g >= 1 && g <= 6)) return vHome();
-  const subs = subjectsOf(g);
-  const access = S.session && hasAccess(g);
-  const rows = subs.length ? subs.map(s => {
-    const total = totalOf(s.id);
-    const chips = KINDS.filter(k => countOf(s.id, k.id)).map(k => `<span class="cnt">${k.label} <b class="num">${countOf(s.id, k.id)}</b></span>`).join("");
-    return `<a class="row" href="#subject-${s.id}">
-      <div class="main"><div class="ttl">${esc(s.name)}</div>
-        ${total ? `<div class="counts">${chips}</div>` : `<span class="soon">الملفّات قريبًا</span>`}
+  S.lastGrade = g;
+  const ds = domainsOf(g);
+  const rows = ds.length ? ds.map(d => {
+    const owned = S.session ? ownedTrims(g, d.id) : [];
+    const subs = subjLine(d.id);
+    return `<a class="row" href="#domain-${d.id}">
+      <div class="main"><div class="ttl">${esc(d.name)}</div>
+        <div class="subjline">${esc(subs)}</div>
+        <div class="owned"><span class="cnt num">${nFiles(S.counts[d.id] || 0)}</span>${owned.map(t => `<span class="pill active">${TRIM[t]}</span>`).join("")}</div>
       </div>${icon("chev", "chev")}</a>`;
-  }).join("") : `<div class="empty">لم تُضف موادّ لهذا القسم بعد.</div>`;
+  }).join("") : `<div class="empty">لم تُضف مجالات لهذا القسم بعد.</div>`;
   return `<div class="wrap">
     <nav class="crumbs"><a href="#home">الرئيسية</a>›<span>${GRADE[g]}</span></nav>
     <div class="phead" style="--gc:var(--g${g})"><span class="chip-g">${g}</span>
-      <div class="t"><h1>${GRADE[g]}</h1><span class="muted small num">${subs.length} مادة</span></div>
-      ${access ? `<span class="pill active">اشتراكك مفعّل</span>` : `<a class="btn primary" href="#subscribe" data-act="pregrade" data-g="${g}">اشترك في هذا القسم</a>`}
+      <div class="t"><h1>${GRADE[g]}</h1><span class="muted small">${nDomains(ds.length)} · ${money(C.PRICE)} للمجال في الثلاثي</span></div>
+      <a class="btn primary" href="#subscribe" data-act="presub" data-g="${g}">اشترك</a>
     </div>
     <div class="list">${rows}</div>
     <div style="height:40px"></div>
   </div>`;
 }
 
-async function vSubject(id){
-  const s = S.subjects.find(x => x.id === id);
-  if (!s) return `<div class="wrap"><div class="empty">هذه المادة غير موجودة.</div></div>`;
-  if (!S.res[id]) S.res[id] = await api.resources(id);
-  const all = S.res[id];
-  const tab = S.kindTab;
-  const list = tab === "all" ? all : all.filter(r => r.kind === tab);
-  const access = S.session && hasAccess(s.grade);
+async function vDomain(id){
+  const d = domainById(id);
+  if (!d) return `<div class="wrap"><div class="empty">هذا المجال غير موجود.</div></div>`;
+  S.lastGrade = d.grade;
+  const subs = subjectsOf(id);
+  const key = "d" + id;
+  if (!S.res[key]) S.res[key] = await api.resources(subs.map(s => s.id));
+  const all = S.res[key];
+  const hasAnnual = all.some(r => r.trimester == null);
+  let t = S.trimTab;
+  if (t == null) t = currentTrim();
+  if (t === 0 && !hasAnnual) t = currentTrim();
+  S.trimTab = t;
+  const tval = t === 0 ? null : t;
+  const inTab = all.filter(r => (r.trimester == null ? 0 : r.trimester) === t);
+  const list = S.kindTab === "all" ? inTab : inTab.filter(r => r.kind === S.kindTab);
+  const access = S.session && hasAccess(d.grade, id, tval);
+  const tabIds = [1, 2, 3].concat(hasAnnual ? [0] : []);
+  const tabs = tabIds.map(x => {
+    const n = all.filter(r => (r.trimester == null ? 0 : r.trimester) === x).length;
+    const lk = !(S.session && hasAccess(d.grade, id, x === 0 ? null : x));
+    return `<button class="tab" data-act="trim" data-t="${x}" aria-pressed="${x === t}">${TRIM[x]} <span class="num">${n}</span>${lk ? `<span class="lk">${icon("lock")}</span>` : ""}</button>`;
+  }).join("");
+  const kinds = [`<button class="kf" data-act="kind" data-k="all" aria-pressed="${S.kindTab === "all"}">الكلّ</button>`]
+    .concat(KINDS.filter(k => inTab.some(r => r.kind === k.id)).map(k => `<button class="kf" data-act="kind" data-k="${k.id}" aria-pressed="${S.kindTab === k.id}">${k.label}</button>`)).join("");
   let notice = "";
+  const buyT = t === 0 ? currentTrim() : t;
   if (!S.session) notice = `<div class="notice">${icon("lock")}<span class="grow">سجّل الدخول لتحميل الملفّات. الملفّات المجانية متاحة لكلّ من لديه حساب.</span><a class="btn primary sm" href="#login" data-act="remember">تسجيل الدخول</a></div>`;
-  else if (!access) notice = `<div class="notice warn">${icon("lock")}<span class="grow">ملفّات ${GRADE[s.grade]} متاحة للمشتركين. اشترك لتحميل كلّ ملفّات القسم.</span><a class="btn primary sm" href="#subscribe" data-act="pregrade" data-g="${s.grade}">اشترك</a></div>`;
-  const tabs = [`<button class="tab" data-act="kind" data-k="all" aria-pressed="${tab === "all"}">الكلّ <span class="num">${all.length}</span></button>`]
-    .concat(KINDS.map(k => { const n = all.filter(r => r.kind === k.id).length; return `<button class="tab" data-act="kind" data-k="${k.id}" aria-pressed="${tab === k.id}">${k.label} <span class="num">${n}</span></button>`; })).join("");
-  const rows = list.length ? list.map(r => {
-    const can = S.session && (r.is_free || access);
+  else if (!access) notice = `<div class="notice warn">${icon("lock")}<span class="grow">${t === 0 ? `ملفّات «طوال السنة» متاحة لكلّ مشترك في ${esc(d.name)} لأيّ ثلاثي.` : `ملفّات ${esc(d.name)} في ${TRIM[t]} متاحة للمشتركين.`} الاشتراك: <b class="num">${money(C.PRICE)}</b>.</span><a class="btn primary sm" href="#subscribe" data-act="presub" data-g="${d.grade}" data-d="${id}" data-t="${buyT}">اشترك</a></div>`;
+  const rowOf = r => {
+    const can = S.session && (r.is_free || hasAccess(d.grade, id, r.trimester == null ? null : r.trimester));
     return `<div class="row">
       <span class="ico">${icon(KICON[r.kind])}</span>
       <div class="main"><div class="ttl">${esc(r.title)}</div>
         <div class="meta"><span>${KIND[r.kind].one}</span><span>·</span><span>${fmtDate(r.created_at)}</span>${r.is_free ? `<span class="pill free">مجاني</span>` : ""}</div></div>
-      ${can ? `<button class="btn soft sm" data-act="download" data-id="${r.id}" data-s="${id}">${icon("down")}تحميل</button>`
-            : `<button class="btn ghost sm" data-act="locked" data-g="${s.grade}" aria-label="مقفل">${icon("lock")}</button>`}
+      ${can ? `<button class="btn soft sm" data-act="download" data-id="${r.id}" data-k="${key}">${icon("down")}تحميل</button>`
+            : `<button class="btn ghost sm" data-act="locked" data-g="${d.grade}" data-d="${id}" data-t="${buyT}" aria-label="مقفل">${icon("lock")}</button>`}
     </div>`;
-  }).join("") : `<div class="empty">لا توجد ملفّات من هذا النوع بعد.</div>`;
+  };
+  const groups = subs.map(s => {
+    const rs = list.filter(r => r.subject_id === s.id);
+    return rs.length ? `<div class="group-h">${esc(s.name)}</div>${rs.map(rowOf).join("")}` : "";
+  }).join("");
   return `<div class="wrap">
-    <nav class="crumbs"><a href="#home">الرئيسية</a>›<a href="#grade-${s.grade}">${GRADE[s.grade]}</a>›<span>${esc(s.name)}</span></nav>
-    <div class="phead" style="--gc:var(--g${s.grade})"><span class="chip-g">${s.grade}</span>
-      <div class="t"><h1>${esc(s.name)}</h1><span class="muted small">${GRADE[s.grade]}</span></div></div>
+    <nav class="crumbs"><a href="#home">الرئيسية</a>›<a href="#grade-${d.grade}">${GRADE[d.grade]}</a>›<span>${esc(d.name)}</span></nav>
+    <div class="phead" style="--gc:var(--g${d.grade})"><span class="chip-g">${d.grade}</span>
+      <div class="t"><h1>${esc(d.name)}</h1><span class="subjline">${GRADE[d.grade]}${subjLine(id) ? " · " + esc(subjLine(id)) : ""}</span></div></div>
+    <div class="tabs wrapt" role="group" aria-label="الثلاثي">${tabs}</div>
     ${notice}
-    <div class="tabs" role="group" aria-label="نوع الملف">${tabs}</div>
-    <div class="list">${rows}</div>
+    ${inTab.length ? `<div class="kinds-f" role="group" aria-label="نوع الملف">${kinds}</div>` : ""}
+    <div class="list">${groups || `<div class="empty">لا توجد ملفّات في ${TRIM[t]} بعد.</div>`}</div>
     <div style="height:40px"></div>
   </div>`;
 }
@@ -596,7 +720,7 @@ function vLogin(){
     </form>
     <p class="alt">ليس لديك حساب؟ <a href="#register">أنشئ حسابًا</a></p>
     ${api.demo ? `<div class="demo-btns"><span class="small muted">في النسخة التجريبية، جرّب مباشرة:</span>
-      <button class="btn ghost" data-act="demoas" data-who="u-me">الدخول كمعلّم مشترك</button>
+      <button class="btn ghost" data-act="demoas" data-who="u-me">الدخول كمعلّم</button>
       <button class="btn ghost" data-act="demoas" data-who="u-admin">الدخول كمدير (لوحة التحكّم)</button></div>` : ""}
   </div></div>`;
 }
@@ -648,8 +772,8 @@ function subStatus(s){
 function vAccount(){
   const p = S.profile || {};
   const subs = S.subs.length ? S.subs.map(s => `<div class="row"><div class="main">
-      <div class="ttl">${planName(s)}</div>
-      <div class="meta"><span class="num">${s.amount ? money(s.amount) : ""}</span>${s.payment_method ? `<span>· ${esc(s.payment_method)}</span>` : ""}<span>· طُلب في ${fmtDate(s.created_at)}</span>${s.status === "active" && s.expires_at ? `<span>· صالح إلى ${fmtDate(s.expires_at)}</span>` : ""}</div>
+      <div class="ttl">${esc(subDesc(s))}</div>
+      <div class="meta"><span class="num">${s.amount ? money(s.amount) : ""}</span><span>· طُلب في ${fmtDate(s.created_at)}</span>${s.status === "active" && s.expires_at ? `<span>· صالح إلى ${fmtDate(s.expires_at)}</span>` : ""}</div>
     </div>${subStatus(s)}</div>`).join("") : `<div class="empty">ليس لديك اشتراك بعد.</div>`;
   return `<div class="wrap page">
     <nav class="crumbs"><a href="#home">الرئيسية</a>›<span>حسابي</span></nav>
@@ -665,52 +789,67 @@ function vAccount(){
   </div>`;
 }
 
+function domainChecks(g, chosen){
+  const ds = domainsOf(g);
+  if (!ds.length) return `<div class="empty">لا توجد مجالات في هذا القسم.</div>`;
+  return ds.map(d => `<label class="choice"><input type="checkbox" name="domain" value="${d.id}" data-change="pick" ${chosen.includes(d.id) ? "checked" : ""}>
+    <span><b>${esc(d.name)}</b><span class="small muted">${esc(subjLine(d.id))}</span></span></label>`).join("");
+}
+function totalHtml(nd, nt){
+  if (!nd || !nt) return `<span>اختر مجالًا وثلاثيًا على الأقل</span><b class="num">${money(0)}</b>`;
+  return `<span class="num">${nDomains(nd)} × ${nt === 1 ? "ثلاثي واحد" : nt === 2 ? "ثلاثيان" : "3 ثلاثيات"} × ${money(C.PRICE)}</span><b class="num">${money(nd * nt * C.PRICE)}</b>`;
+}
+function updateTotal(){
+  const f = document.querySelector('form[data-form="subscribe"]'); if (!f) return;
+  const nd = f.querySelectorAll('input[name="domain"]:checked').length;
+  const nt = f.querySelectorAll('input[name="trim"]:checked').length;
+  $("#sb-total").innerHTML = totalHtml(nd, nt);
+}
 function vSubscribe(){
   const pending = S.subs.find(s => s.status === "pending");
-  const pre = S.preGrade || 3;
-  const plan = S.prePlan || "grade";
+  const pre = S.pre || { grade: S.lastGrade || 1, domains: [], trims: [currentTrim()] };
+  S.pre = pre;
   return `<div class="wrap narrow">
     <div class="card">
       <h1>اشتراك جديد</h1>
-      ${pending ? `<div class="notice warn">لديك طلب (${planName(pending)}) في انتظار التفعيل. سنفعّله ${esc(C.ACTIVATION_DELAY)}.</div>` : ""}
+      ${pending ? `<div class="notice warn">لديك طلب (${esc(subDesc(pending))}) في انتظار التفعيل. سنفعّله ${esc(C.ACTIVATION_DELAY)}.</div>` : ""}
       <form class="f" data-form="subscribe" novalidate>
         <div class="err" role="alert"></div>
-        <div class="field"><span style="font-weight:600">نوع الاشتراك</span>
-          <label class="choice"><input type="radio" name="plan" value="grade" ${plan === "grade" ? "checked" : ""} data-change="plan">
-            <span><b>قسم واحد · <span class="num">${money(C.PRICES.grade)}</span></b><span class="small muted">كلّ موادّ القسم الذي تختاره</span></span></label>
-          <label class="choice"><input type="radio" name="plan" value="all" ${plan === "all" ? "checked" : ""} data-change="plan">
-            <span><b>كلّ الأقسام · <span class="num">${money(C.PRICES.all)}</span></b><span class="small muted">الأقسام الستّة بكلّ موادّها</span></span></label>
-        </div>
-        <div class="field" id="grade-field" ${plan === "all" ? "hidden" : ""}><label for="sb-grade">القسم</label>
-          <select id="sb-grade" name="grade">${[1,2,3,4,5,6].map(g => `<option value="${g}" ${g === pre ? "selected" : ""}>${GRADE[g]}</option>`).join("")}</select></div>
+        <div class="field"><label for="sb-grade">القسم</label>
+          <select id="sb-grade" name="grade" data-change="sgrade">${[1,2,3,4,5,6].map(g => `<option value="${g}" ${g === pre.grade ? "selected" : ""}>${GRADE[g]}</option>`).join("")}</select></div>
+        <div class="field"><span style="font-weight:600">المجالات</span><div class="checks" id="sb-domains">${domainChecks(pre.grade, pre.domains)}</div></div>
+        <div class="field"><span style="font-weight:600">الثلاثيات</span><div class="checks">
+          ${[1,2,3].map(t => `<label class="choice"><input type="checkbox" name="trim" value="${t}" data-change="pick" ${pre.trims.includes(t) ? "checked" : ""}><span><b>${TRIM[t]}</b><span class="small muted">${TRIM_MONTHS[t]}</span></span></label>`).join("")}
+        </div></div>
+        <div class="total" id="sb-total">${totalHtml(pre.domains.length, pre.trims.length)}</div>
         <div class="field"><span style="font-weight:600">الدفع عبر D17</span><span class="hint">أرسل المبلغ إلى الرقم التالي، ثم اكتب رقم العملية.</span></div>
-        <input type="hidden" name="method" value="D17">
-        <div class="payto" id="payto">${payto("D17")}</div>
+        <div class="payto">${payto()}</div>
         <div class="field"><label for="sb-ref">رقم العملية</label><input id="sb-ref" name="ref" class="ltr" required placeholder="مثال: 48213977"><span class="hint">تجده في رسالة التأكيد بعد الدفع. نستعمله للتثبّت من دفعتك.</span></div>
         <button class="btn primary block" type="submit">أرسل طلب الاشتراك</button>
       </form>
     </div>
   </div>`;
 }
-function payto(m){
-  const v = m === "D17" ? C.D17_NUMBER : C.TRANSFER_INFO;
-  return `<span class="small muted">${m === "D17" ? "رقم D17:" : "الحساب:"}</span><code id="payval">${esc(v)}</code>
+function payto(){
+  const v = C.D17_NUMBER;
+  return `<span class="small muted">رقم D17:</span><code id="payval">${esc(v)}</code>
     <button type="button" class="btn ghost sm" data-act="copy" data-v="${esc(v)}">${icon("copy")}نسخ</button>`;
 }
 
+/* ---------------- لوحة التحكّم ---------------- */
 async function vAdmin(){
-  if (!S.profile || !S.profile.is_admin) return `<div class="wrap"><div class="empty">هذه الصفحة للمدير فقط.</div></div>`;
+  if (!isAdmin()) return `<div class="wrap"><div class="empty">هذه الصفحة للمدير فقط.</div></div>`;
   if (!S.admSubs) S.admSubs = await api.allSubs();
   const a = S.adm;
   const pendingN = S.admSubs.filter(s => s.status === "pending").length;
-  const tabs = [["requests", "الطلبات", pendingN], ["subs", "المشتركون"], ["users", "الحسابات"], ["files", "الملفّات"], ["subjects", "الموادّ"]]
+  const tabs = [["requests", "الطلبات", pendingN], ["subs", "المشتركون"], ["users", "الحسابات"], ["files", "الملفّات"], ["domains", "المجالات"]]
     .map(([id, l, c]) => `<button class="atab" data-act="atab" data-t="${id}" aria-pressed="${a.tab === id}">${l}${c ? `<span class="c num">${c}</span>` : ""}</button>`).join("");
   let body = "";
   if (a.tab === "requests") body = admRequests(S.admSubs.filter(s => s.status === "pending"));
   else if (a.tab === "subs") body = admSubs(S.admSubs.filter(s => s.status !== "pending"));
   else if (a.tab === "users") body = await admUsers();
   else if (a.tab === "files") body = await admFiles();
-  else body = admSubjects();
+  else body = admDomains();
   return `<div class="wrap page">
     <nav class="crumbs"><a href="#home">الرئيسية</a>›<span>لوحة التحكّم</span></nav>
     <h1 style="font-size:26px">لوحة التحكّم</h1>
@@ -723,9 +862,9 @@ function admRequests(list){
   if (!list.length) return `<div class="list"><div class="empty">لا توجد طلبات جديدة.</div></div>`;
   return `<div class="list">${list.map(s => `<div class="req">
     <div class="top">${who(s)}</div>
-    <div class="meta" style="display:flex;gap:6px 12px;flex-wrap:wrap;font-size:14px">
-      <span><b>${planName(s)}</b></span><span class="num">${s.amount ? money(s.amount) : ""}</span>
-      <span>${esc(s.payment_method || "")}: <code style="user-select:all;direction:ltr;unicode-bidi:isolate">${esc(s.payment_ref || "—")}</code></span>
+    <div style="display:grid;gap:2px;font-size:14px">
+      <b>${esc(subDesc(s))}</b>
+      <span>المبلغ: <b class="num">${s.amount ? money(s.amount) : "—"}</b> · ${esc(s.payment_method || "")}: <code style="user-select:all;direction:ltr;unicode-bidi:isolate">${esc(s.payment_ref || "—")}</code></span>
       <span class="muted">${fmtDate(s.created_at)}</span></div>
     <div class="acts">
       <div class="field"><label for="exp-${s.id}" class="small">صالح إلى</label><input id="exp-${s.id}" type="date" value="${defaultExpiry()}"></div>
@@ -733,55 +872,65 @@ function admRequests(list){
       <button class="btn danger sm" data-act="reject" data-id="${s.id}">رفض</button>
     </div></div>`).join("")}</div>`;
 }
+function admSubs(list){
+  if (!list.length) return `<div class="list"><div class="empty">لا يوجد مشتركون بعد.</div></div>`;
+  return `<div class="list">${list.map(s => `<div class="req">
+    <div class="top">${who(s)}${subStatus(s)}</div>
+    <div style="display:flex;gap:4px 12px;flex-wrap:wrap;font-size:14px"><b>${esc(subDesc(s))}</b>
+      ${s.expires_at ? `<span class="muted">إلى ${fmtDate(s.expires_at)}</span>` : ""}<span class="muted num">${s.amount ? money(s.amount) : ""} · ${esc(s.payment_ref || "")}</span></div>
+    <div class="acts">${s.status === "active" ? `<button class="btn danger sm" data-act="deactivate" data-id="${s.id}" data-confirm="تأكيد الإيقاف؟">إيقاف الاشتراك</button>`
+      : `<button class="btn ok sm" data-act="reactivate" data-id="${s.id}">تفعيل إلى ${fmtDate(defaultExpiry())}</button>`}</div>
+  </div>`).join("")}</div>`;
+}
 async function admUsers(){
   const users = await api.profiles();
   const subsOf = id => (S.admSubs || []).filter(s => s.user_id === id);
   const state = u => {
     if (u.is_admin) return `<span class="pill free">مدير</span>`;
     const ss = subsOf(u.id);
-    if (ss.some(s => s.status === "active" && (!s.expires_at || s.expires_at >= today()))) return `<span class="pill active">مشترك</span>`;
+    if (ss.some(isActive)) return `<span class="pill active">مشترك</span>`;
     if (ss.some(s => s.status === "pending")) return `<span class="pill pending">طلب في الانتظار</span>`;
     return `<span class="pill expired">بلا اشتراك</span>`;
   };
   const rows = users.map(u => `<div class="req">
     <div class="top"><b>${esc(u.full_name || "—")}</b>${state(u)}</div>
-    <div class="meta" style="display:flex;gap:4px 14px;flex-wrap:wrap;font-size:14px">
+    <div style="display:flex;gap:4px 14px;flex-wrap:wrap;font-size:14px">
       <span class="muted" style="direction:ltr;unicode-bidi:isolate;user-select:all">${esc(u.email || "")}</span>
       ${u.phone ? `<span class="muted" style="direction:ltr;unicode-bidi:isolate;user-select:all">${esc(u.phone)}</span>` : ""}
       <span class="muted">سجّل في ${fmtDate(u.created_at)}</span></div>
   </div>`).join("");
   return `<p class="muted small num">عدد الحسابات: ${users.length}</p><div class="list">${rows || `<div class="empty">لا توجد حسابات بعد.</div>`}</div>`;
 }
-function admSubs(list){
-  if (!list.length) return `<div class="list"><div class="empty">لا يوجد مشتركون بعد.</div></div>`;
-  return `<div class="list">${list.map(s => `<div class="req">
-    <div class="top">${who(s)}${subStatus(s)}</div>
-    <div class="meta" style="display:flex;gap:6px 12px;flex-wrap:wrap;font-size:14px"><b>${planName(s)}</b>
-      ${s.expires_at ? `<span class="muted">إلى ${fmtDate(s.expires_at)}</span>` : ""}<span class="muted">${esc(s.payment_method || "")} ${esc(s.payment_ref || "")}</span></div>
-    <div class="acts">${s.status === "active" ? `<button class="btn danger sm" data-act="deactivate" data-id="${s.id}" data-confirm="تأكيد الإيقاف؟">إيقاف الاشتراك</button>`
-      : `<button class="btn ok sm" data-act="reactivate" data-id="${s.id}">تفعيل إلى ${fmtDate(defaultExpiry())}</button>`}</div>
-  </div>`).join("")}</div>`;
-}
 async function admFiles(){
   const a = S.adm;
-  const subs = subjectsOf(a.grade);
-  if (!subs.find(s => s.id === a.subject)) a.subject = subs[0] ? subs[0].id : null;
+  const ds = domainsOf(a.grade);
+  if (!ds.find(d => d.id === a.domain)) a.domain = ds[0] ? ds[0].id : null;
+  const ss = a.domain ? subjectsOf(a.domain) : [];
+  if (!ss.find(s => s.id === a.subject)) a.subject = ss[0] ? ss[0].id : null;
   let existing = "";
   if (a.subject){
-    if (!S.res[a.subject]) S.res[a.subject] = await api.resources(a.subject);
-    const list = S.res[a.subject];
-    existing = list.length ? list.map(r => `<div class="row"><span class="ico">${icon(KICON[r.kind])}</span>
-      <div class="main"><div class="ttl">${esc(r.title)}</div><div class="meta"><span>${KIND[r.kind].one}</span><span>·</span><span style="direction:ltr;unicode-bidi:isolate">${esc(r.file_name || "")}</span>${r.is_free ? `<span class="pill free">مجاني</span>` : ""}</div></div>
-      <button class="btn danger sm" data-act="delres" data-id="${r.id}" data-confirm="تأكيد الحذف؟">حذف</button></div>`).join("")
-      : `<div class="empty">لا توجد ملفّات في هذه المادة بعد.</div>`;
+    const key = "s" + a.subject;
+    if (!S.res[key]) S.res[key] = await api.resources([a.subject]);
+    const list = S.res[key];
+    existing = list.length ? [1, 2, 3, 0].map(t => {
+      const rs = list.filter(r => (r.trimester == null ? 0 : r.trimester) === t);
+      return rs.length ? `<div class="group-h">${TRIM[t]}</div>` + rs.map(r => `<div class="row"><span class="ico">${icon(KICON[r.kind])}</span>
+        <div class="main"><div class="ttl">${esc(r.title)}</div><div class="meta"><span>${KIND[r.kind].one}</span><span>·</span><span style="direction:ltr;unicode-bidi:isolate">${esc(r.file_name || "")}</span>${r.is_free ? `<span class="pill free">مجاني</span>` : ""}</div></div>
+        <button class="btn danger sm" data-act="delres" data-id="${r.id}" data-k="${key}" data-confirm="تأكيد الحذف؟">حذف</button></div>`).join("") : "";
+    }).join("") : `<div class="empty">لا توجد ملفّات في هذه المادة بعد.</div>`;
   }
+  const subjName = (subjectById(a.subject) || {}).name || "";
   return `<div class="card">
     <h2 style="font-size:19px">إضافة ملف</h2>
     <form class="f" data-form="upload" novalidate>
       <div class="err" role="alert"></div>
       <div class="two">
         <div class="field"><label for="up-grade">القسم</label><select id="up-grade" name="grade" data-change="upgrade">${[1,2,3,4,5,6].map(g => `<option value="${g}" ${g === a.grade ? "selected" : ""}>${GRADE[g]}</option>`).join("")}</select></div>
-        <div class="field"><label for="up-subject">المادة</label><select id="up-subject" name="subject" data-change="upsubject">${subs.map(s => `<option value="${s.id}" ${s.id === a.subject ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></div>
+        <div class="field"><label for="up-domain">المجال</label><select id="up-domain" name="domain" data-change="updomain">${ds.map(d => `<option value="${d.id}" ${d.id === a.domain ? "selected" : ""}>${esc(d.name)}</option>`).join("")}</select></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="up-subject">المادة</label><select id="up-subject" name="subject" data-change="upsubject">${ss.map(s => `<option value="${s.id}" ${s.id === a.subject ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></div>
+        <div class="field"><label for="up-trim">الثلاثي</label><select id="up-trim" name="trim">${[1,2,3].map(t => `<option value="${t}" ${t === (a.trim || currentTrim()) ? "selected" : ""}>${TRIM[t]}</option>`).join("")}<option value="0" ${a.trim === 0 ? "selected" : ""}>طوال السنة (لكلّ مشترك في المجال)</option></select></div>
       </div>
       <div class="field"><label for="up-kind">النوع</label><select id="up-kind" name="kind">${KINDS.map(k => `<option value="${k.id}">${k.label}</option>`).join("")}</select></div>
       <div class="field"><label for="up-title">العنوان</label><input id="up-title" name="title" required placeholder="مثال: قراءة – الوحدة 2"></div>
@@ -790,24 +939,35 @@ async function admFiles(){
       <button class="btn primary" type="submit">${icon("down")}رفع الملف</button>
     </form>
   </div>
-  <div><div class="sec-head"><h2 style="font-size:19px">ملفّات ${esc((subs.find(s => s.id === a.subject) || {}).name || "")} · ${GRADE[a.grade]}</h2></div>
-  <div class="list">${existing || `<div class="empty">أضف مادة أولًا.</div>`}</div></div>`;
+  <div><div class="sec-head"><h2 style="font-size:19px">ملفّات ${esc(subjName)} · ${GRADE[a.grade]}</h2></div>
+  <div class="list">${existing || `<div class="empty">أضف مجالًا ومادة أولًا من تبويب «المجالات».</div>`}</div></div>`;
 }
-function admSubjects(){
-  const g = S.adm.subjGrade;
-  const subs = subjectsOf(g);
-  return `<div class="card">
-    <div class="field"><label for="sj-grade">القسم</label><select id="sj-grade" data-change="sjgrade">${[1,2,3,4,5,6].map(x => `<option value="${x}" ${x === g ? "selected" : ""}>${GRADE[x]}</option>`).join("")}</select></div>
-    <div class="list">${subs.map(s => `<div class="row"><div class="main"><div class="ttl">${esc(s.name)}</div><div class="meta num">${totalOf(s.id)} ملف</div></div>
-      <button class="btn danger sm" data-act="delsubj" data-id="${s.id}" data-confirm="${totalOf(s.id) ? "سيُحذف معها كل ملفّاتها. تأكيد؟" : "تأكيد الحذف؟"}">حذف</button></div>`).join("") || `<div class="empty">لا توجد موادّ.</div>`}</div>
-    <form class="f" data-form="addsubj" novalidate style="grid-template-columns:1fr auto;align-items:end">
-      <div class="field"><label for="sj-name">مادة جديدة في ${GRADE[g]}</label><input id="sj-name" name="name" required placeholder="مثال: الإنجليزية"></div>
-      <button class="btn primary" type="submit">إضافة</button>
-    </form>
-  </div>`;
+function admDomains(){
+  const g = S.adm.domGrade;
+  const ds = domainsOf(g);
+  const cards = ds.map(d => {
+    const ss = subjectsOf(d.id);
+    return `<div class="card dom-card">
+      <div class="hd"><h3>${esc(d.name)}</h3><button class="btn danger sm" data-act="deldom" data-id="${d.id}" data-confirm="${(S.counts[d.id] || 0) ? "ستُحذف كلّ موادّه وملفّاته. تأكيد؟" : "تأكيد حذف المجال؟"}">حذف المجال</button></div>
+      <div class="list">${ss.map(s => `<div class="row"><div class="main"><div class="ttl">${esc(s.name)}</div></div>
+        <button class="btn ghost sm" data-act="delsubj" data-id="${s.id}" data-confirm="تحذف المادة وملفّاتها؟">حذف</button></div>`).join("") || `<div class="empty">لا توجد موادّ.</div>`}</div>
+      <form class="f inline-f" data-form="addsubj" data-d="${d.id}" novalidate>
+        <div class="field"><label for="sj-${d.id}" class="small">مادة جديدة في ${esc(d.name)}</label><input id="sj-${d.id}" name="name" required placeholder="مثال: الخطّ"></div>
+        <button class="btn soft" type="submit">إضافة</button>
+      </form>
+    </div>`;
+  }).join("");
+  return `<div class="field" style="max-width:320px"><label for="dm-grade">القسم</label><select id="dm-grade" data-change="domgrade">${[1,2,3,4,5,6].map(x => `<option value="${x}" ${x === g ? "selected" : ""}>${GRADE[x]}</option>`).join("")}</select></div>
+    ${cards || `<div class="list"><div class="empty">لا توجد مجالات في هذا القسم.</div></div>`}
+    <div class="card">
+      <form class="f inline-f" data-form="adddom" novalidate>
+        <div class="field"><label for="dm-name">مجال جديد في ${GRADE[g]}</label><input id="dm-name" name="name" required placeholder="مثال: الإنجليزية"></div>
+        <button class="btn primary" type="submit">إضافة المجال</button>
+      </form>
+    </div>`;
 }
 
-const VIEWS = { home: vHome, grade: vGrade, subject: vSubject, login: vLogin, register: vRegister, forgot: vForgot, account: vAccount, subscribe: vSubscribe, admin: vAdmin };
+const VIEWS = { home: vHome, grade: vGrade, domain: vDomain, login: vLogin, register: vRegister, forgot: vForgot, account: vAccount, subscribe: vSubscribe, admin: vAdmin };
 const NEEDS_LOGIN = ["account", "subscribe", "admin"];
 
 let seqR = 0;
@@ -824,7 +984,7 @@ async function render(scrollTop){
   let out;
   try { out = view(S.param); } catch (e) { out = errBox(e); }
   if (out && typeof out.then === "function"){
-    main.innerHTML = `<div class="loading">جارٍ التحميل…</div>`;
+    if (!main.firstElementChild || scrollTop) main.innerHTML = `<div class="loading">جارٍ التحميل…</div>`;
     try { out = await out; } catch (e) { out = errBox(e); }
     if (n !== seqR) return;
   }
@@ -842,20 +1002,25 @@ let toastT;
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 3800); }
 async function busy(btn, fn){ const old = btn.innerHTML; btn.disabled = true; try { return await fn(); } finally { if (btn.isConnected){ btn.disabled = false; btn.innerHTML = old; } } }
 function formErr(f, msg){ const e = f.querySelector(".err"); if (e){ e.textContent = msg || ""; e.classList.toggle("on", !!msg); } }
-const resById = (sid, id) => (S.res[sid] || []).find(r => r.id === id);
-function afterLoginGo(){ const t = S.afterLogin || (S.profile && S.profile.is_admin ? "admin" : "account"); S.afterLogin = null; go(t); }
+const resIn = (key, id) => (S.res[key] || []).find(r => r.id === id);
+function afterLoginGo(){ const t = S.afterLogin || (isAdmin() ? "admin" : "account"); S.afterLogin = null; go(t); }
+function preFrom(b){
+  const g = +b.dataset.g || S.lastGrade || 1;
+  S.pre = { grade: g, domains: b.dataset.d ? [+b.dataset.d] : [], trims: [b.dataset.t ? +b.dataset.t : currentTrim()] };
+}
+async function adminDo(b, fn, msg){ await busy(b, async () => { try { await fn(); toast(msg); render(); } catch (e) { toast(arError(e)); } }); }
 
 const ACTS = {
+  trim(b){ S.trimTab = +b.dataset.t; S.kindTab = "all"; render(); },
   kind(b){ S.kindTab = b.dataset.k; render(); },
-  plan(b){ S.prePlan = b.dataset.plan; },
-  pregrade(b){ S.preGrade = +b.dataset.g; S.prePlan = "grade"; },
+  presub(b){ preFrom(b); },
   remember(){ S.afterLogin = location.hash.slice(1); },
   locked(b){
     if (!S.session){ S.afterLogin = location.hash.slice(1); go("login"); }
-    else { S.preGrade = +b.dataset.g; S.prePlan = "grade"; go("subscribe"); }
+    else { preFrom(b); go("subscribe"); }
   },
   async download(b){
-    const r = resById(+b.dataset.s, +b.dataset.id); if (!r) return;
+    const r = resIn(b.dataset.k, +b.dataset.id); if (!r) return;
     await busy(b, async () => {
       try {
         const url = await api.downloadUrl(r);
@@ -875,16 +1040,17 @@ const ACTS = {
   atab(b){ S.adm.tab = b.dataset.t; render(); },
   async approve(b){
     const id = +b.dataset.id; const exp = (document.getElementById("exp-" + id) || {}).value || defaultExpiry();
-    await busy(b, async () => { try { await api.setSub(id, { status: "active", expires_at: exp }); S.admSubs = null; toast("تمّ تفعيل الاشتراك."); render(); } catch (e) { toast(arError(e)); } });
+    await adminDo(b, async () => { await api.setSub(id, { status: "active", expires_at: exp }); S.admSubs = null; }, "تمّ تفعيل الاشتراك.");
   },
-  async reject(b){ await busy(b, async () => { try { await api.setSub(+b.dataset.id, { status: "rejected" }); S.admSubs = null; toast("تمّ رفض الطلب."); render(); } catch (e) { toast(arError(e)); } }); },
-  async deactivate(b){ await busy(b, async () => { try { await api.setSub(+b.dataset.id, { status: "rejected" }); S.admSubs = null; toast("تمّ إيقاف الاشتراك."); render(); } catch (e) { toast(arError(e)); } }); },
-  async reactivate(b){ await busy(b, async () => { try { await api.setSub(+b.dataset.id, { status: "active", expires_at: defaultExpiry() }); S.admSubs = null; toast("تمّ التفعيل."); render(); } catch (e) { toast(arError(e)); } }); },
+  async reject(b){ await adminDo(b, async () => { await api.setSub(+b.dataset.id, { status: "rejected" }); S.admSubs = null; }, "تمّ رفض الطلب."); },
+  async deactivate(b){ await adminDo(b, async () => { await api.setSub(+b.dataset.id, { status: "rejected" }); S.admSubs = null; }, "تمّ إيقاف الاشتراك."); },
+  async reactivate(b){ await adminDo(b, async () => { await api.setSub(+b.dataset.id, { status: "active", expires_at: defaultExpiry() }); S.admSubs = null; }, "تمّ التفعيل."); },
   async delres(b){
-    const r = resById(S.adm.subject, +b.dataset.id); if (!r) return;
-    await busy(b, async () => { try { await api.deleteResource(r); delete S.res[S.adm.subject]; await loadCatalog(); toast("تمّ حذف الملف."); render(); } catch (e) { toast(arError(e)); } });
+    const r = resIn(b.dataset.k, +b.dataset.id); if (!r) return;
+    await adminDo(b, async () => { await api.deleteResource(r); await loadCatalog(); }, "تمّ حذف الملف.");
   },
-  async delsubj(b){ await busy(b, async () => { try { await api.deleteSubject(+b.dataset.id); await loadCatalog(); toast("تمّ حذف المادة."); render(); } catch (e) { toast(arError(e)); } }); }
+  async delsubj(b){ await adminDo(b, async () => { await api.deleteSubject(+b.dataset.id); await loadCatalog(); }, "تمّ حذف المادة."); },
+  async deldom(b){ await adminDo(b, async () => { await api.deleteDomain(+b.dataset.id); await loadCatalog(); }, "تمّ حذف المجال."); }
 };
 
 document.addEventListener("click", e => {
@@ -899,16 +1065,17 @@ document.addEventListener("click", e => {
 
 document.addEventListener("change", e => {
   const t = e.target, k = t.dataset && t.dataset.change; if (!k) return;
-  if (k === "plan"){ S.prePlan = t.value; const gf = $("#grade-field"); if (gf) gf.hidden = t.value === "all"; }
-  if (k === "method"){ $("#payto").innerHTML = payto(t.value); }
-  if (k === "upgrade"){ S.adm.grade = +t.value; S.adm.subject = null; render(); }
+  if (k === "sgrade"){ const g = +t.value; S.pre = { ...(S.pre || {}), grade: g, domains: [], trims: (S.pre && S.pre.trims) || [currentTrim()] }; $("#sb-domains").innerHTML = domainChecks(g, []); updateTotal(); }
+  if (k === "pick") updateTotal();
+  if (k === "upgrade"){ S.adm.grade = +t.value; S.adm.domain = null; S.adm.subject = null; render(); }
+  if (k === "updomain"){ S.adm.domain = +t.value; S.adm.subject = null; render(); }
   if (k === "upsubject"){ S.adm.subject = +t.value; render(); }
-  if (k === "sjgrade"){ S.adm.subjGrade = +t.value; render(); }
+  if (k === "domgrade"){ S.adm.domGrade = +t.value; render(); }
 });
 
 const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 const FORMS = {
-  async login(f, d, btn){
+  async login(f, d){
     if (!emailOk(d.email)) return formErr(f, "اكتب بريدًا إلكترونيًا صحيحًا.");
     if (!d.password) return formErr(f, "اكتب كلمة السرّ.");
     S.session = await api.signIn(d.email.trim(), d.password); await loadUser(); afterLoginGo();
@@ -920,46 +1087,56 @@ const FORMS = {
     if (d.password !== d.password2) return formErr(f, "كلمتا السرّ غير متطابقتين.");
     const r = await api.signUp({ email: d.email.trim(), password: d.password, full_name: d.full_name.trim(), phone: d.phone.trim() });
     if (r && r.session){ S.session = r.session; await loadUser(); toast("مرحبًا بك! تمّ إنشاء حسابك."); afterLoginGo(); }
-    else f.closest(".card").innerHTML = `<h1>تحقّق من بريدك</h1><p>أرسلنا رسالة إلى <b style="direction:ltr;unicode-bidi:isolate">${esc(d.email)}</b>. اضغط على الرابط داخلها لتفعيل حسابك، ثم سجّل الدخول.</p><a class="btn primary" href="#login">تسجيل الدخول</a>`;
+    else f.closest(".card").innerHTML = `<h1>تحقّق من بريدك</h1><p>أرسلنا رسالة إلى <b style="direction:ltr;unicode-bidi:isolate">${esc(d.email)}</b>. اضغط على الرابط داخلها لتفعيل حسابك، ثم سجّل الدخول. إذا لم تجدها، تفقّد البريد غير المرغوب فيه (Spam).</p><a class="btn primary" href="#login">تسجيل الدخول</a>`;
   },
   async forgot(f, d){
     if (!emailOk(d.email)) return formErr(f, "اكتب بريدًا إلكترونيًا صحيحًا.");
     await api.resetPassword(d.email.trim());
-    f.closest(".card").innerHTML = `<h1>تحقّق من بريدك</h1><p>إذا كان البريد مسجّلًا، ستصلك رسالة فيها رابط لتعيين كلمة سرّ جديدة.</p><a class="btn ghost" href="#login">رجوع</a>`;
+    f.closest(".card").innerHTML = `<h1>تحقّق من بريدك</h1><p>إذا كان البريد مسجّلًا، ستصلك رسالة فيها رابط لتعيين كلمة سرّ جديدة. تفقّد أيضًا البريد غير المرغوب فيه (Spam).</p><a class="btn ghost" href="#login">رجوع</a>`;
   },
   async newpw(f, d){
     if (d.password.length < 6) return formErr(f, "كلمة السرّ يجب أن تكون 6 أحرف على الأقل.");
     await api.updatePassword(d.password); S.recovery = false; toast("تمّ حفظ كلمة السرّ الجديدة."); go("account");
   },
-  async subscribe(f, d){
+  async subscribe(f, d, fd){
+    const domain_ids = fd.getAll("domain").map(Number);
+    const trimesters = fd.getAll("trim").map(Number);
+    if (!domain_ids.length) return formErr(f, "اختر مجالًا واحدًا على الأقل.");
+    if (!trimesters.length) return formErr(f, "اختر ثلاثيًا واحدًا على الأقل.");
     if (!d.ref.trim()) return formErr(f, "اكتب رقم العملية حتى نتثبّت من الدفع.");
-    const all = d.plan === "all";
-    await api.requestSub({ plan: all ? "all" : "grade", grade: all ? null : +d.grade, payment_method: d.method, payment_ref: d.ref.trim(), amount: all ? C.PRICES.all : C.PRICES.grade });
-    S.subs = await api.mySubs(S.session.user.id); S.admSubs = null;
+    await api.requestSub({ grade: +d.grade, domain_ids, trimesters, payment_method: "D17", payment_ref: d.ref.trim(), amount: domain_ids.length * trimesters.length * C.PRICE });
+    S.subs = await api.mySubs(S.session.user.id); S.admSubs = null; S.pre = null;
     toast("وصلنا طلبك. سنفعّل اشتراكك " + C.ACTIVATION_DELAY + "."); go("account");
   },
   async upload(f, d){
     const file = f.querySelector("#up-file").files[0];
+    if (!d.subject) return formErr(f, "اختر المادة. إذا لم توجد، أضفها من تبويب «المجالات».");
     if (!d.title.trim()) return formErr(f, "اكتب عنوان الملف.");
     if (!file) return formErr(f, "اختر الملف الذي تريد رفعه.");
     if (file.size > 50 * 1024 * 1024) return formErr(f, "الملف أكبر من 50 ميغا. صغّره أو قسّمه.");
-    const sid = +d.subject;
-    await api.upload({ grade: +d.grade, subject_id: sid, kind: d.kind, title: d.title.trim(), file, is_free: !!f.querySelector("#up-free").checked });
-    delete S.res[sid]; await loadCatalog(); toast("تمّ رفع الملف."); render();
+    const t = +d.trim; S.adm.trim = t;
+    await api.upload({ grade: +d.grade, subject_id: +d.subject, kind: d.kind, trimester: t === 0 ? null : t, title: d.title.trim(), file, is_free: !!f.querySelector("#up-free").checked });
+    await loadCatalog(); toast("تمّ رفع الملف."); render();
+  },
+  async adddom(f, d){
+    if (!d.name.trim()) return formErr(f, "اكتب اسم المجال.");
+    const g = S.adm.domGrade; const max = Math.max(0, ...domainsOf(g).map(x => x.sort || 0));
+    await api.addDomain({ grade: g, name: d.name.trim(), sort: max + 1 }); await loadCatalog(); toast("تمّت إضافة المجال."); render();
   },
   async addsubj(f, d){
     if (!d.name.trim()) return formErr(f, "اكتب اسم المادة.");
-    const g = S.adm.subjGrade; const max = Math.max(0, ...subjectsOf(g).map(s => s.sort || 0));
-    await api.addSubject({ grade: g, name: d.name.trim(), sort: max + 1 }); await loadCatalog(); toast("تمّت إضافة المادة."); render();
+    const did = +f.dataset.d; const max = Math.max(0, ...subjectsOf(did).map(x => x.sort || 0));
+    await api.addSubject({ domain_id: did, name: d.name.trim(), sort: max + 1 }); await loadCatalog(); toast("تمّت إضافة المادة."); render();
   }
 };
 document.addEventListener("submit", async e => {
   const f = e.target; const k = f.dataset && f.dataset.form; if (!k) return;
   e.preventDefault(); formErr(f, "");
-  const d = Object.fromEntries(new FormData(f).entries());
+  const fd = new FormData(f);
+  const d = Object.fromEntries(fd.entries());
   ["email","password","password2","full_name","phone","ref","title","name"].forEach(x => { if (d[x] == null) d[x] = ""; });
   const btn = f.querySelector('[type="submit"]');
-  await busy(btn, async () => { try { await FORMS[k](f, d, btn); } catch (err) { formErr(f, arError(err)); } });
+  await busy(btn, async () => { try { await FORMS[k](f, d, fd); } catch (err) { formErr(f, arError(err)); } });
 });
 
 /* ============================================================
